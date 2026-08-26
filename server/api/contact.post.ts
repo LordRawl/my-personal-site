@@ -8,6 +8,13 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const config = useRuntimeConfig()
 
+  console.log('DEBUG runtimeConfig:', {
+    tokenLen: config.telegramBotToken?.length ?? -1,
+    chatIdLen: config.telegramChatId?.length ?? -1,
+    envTokenLen: process.env.NUXT_TELEGRAM_BOT_TOKEN?.length ?? -1,
+    envChatIdLen: process.env.NUXT_TELEGRAM_CHAT_ID?.length ?? -1,
+  })
+
   if (body.website) {
     throw createError({ statusCode: 400, message: 'Bad request' })
   }
