@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { contacts } from '~/data/contacts'
+import { profile } from '~/data/profile'
 
 const form = reactive({ name: '', contact: '', message: '', website: '' })
 const errors = reactive<Record<string, string | undefined>>({})
@@ -85,61 +85,47 @@ onBeforeUnmount(() => {
     id="contacts"
     class="screen grid-lines border-t border-border px-6 py-24 md:px-14 md:py-32 lg:py-10"
   >
-    <SectionHeading index="05" eyebrow="Контакты и ссылки">
-      <template #title> Обсудим <span class="text-primary">задачу</span> </template>
-      <template #note>
-        Открыт к удалённой работе, частичной занятости и проектным задачам. Отвечаю в течение дня,
-        срочное — сразу в Telegram.
-      </template>
-    </SectionHeading>
-
     <div class="grid gap-12 lg:grid-cols-[1fr_1fr] lg:gap-12">
-      <div
-        class="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2"
-      >
-        <a
-          v-for="(contact, i) in contacts"
-          :key="contact.label"
-          :href="contact.href"
-          :target="contact.href.startsWith('http') ? '_blank' : undefined"
-          rel="noreferrer noopener"
-          class="reveal group flex flex-col gap-3 bg-card p-[clamp(1rem,2.4vh,1.5rem)] transition-colors duration-300 hover:bg-secondary"
-          :style="{ transitionDelay: `${90 + i * 90}ms` }"
-        >
-          <span class="flex items-center justify-between">
-            <span
-              class="flex h-10 w-10 items-center justify-center rounded-md border border-border text-primary transition-transform duration-300 group-hover:-translate-y-0.5"
-            >
-              <AppIcon :name="contact.icon" />
-            </span>
-            <AppIcon
-              name="arrow-up-right"
-              :size="16"
-              class="text-muted-foreground transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary"
-            />
-          </span>
-          <span class="font-display text-sm font-semibold text-foreground">
-            {{ contact.label }}
-          </span>
-          <span class="break-all text-sm text-muted-foreground">{{ contact.value }}</span>
-          <span class="mt-auto pt-2 text-xs text-muted-foreground/80">{{ contact.note }}</span>
-        </a>
+      <div class="flex flex-col justify-between">
+        <SectionHeading index="05" eyebrow="Контакты и ссылки">
+          <template #title> Обсудим <span class="text-primary">задачу</span> </template>
+          <template #note>
+            Открыт к удалённой работе, частичной занятости и проектным задачам. Отвечаю в течение
+            дня, срочное — сразу в Telegram.
+          </template>
+        </SectionHeading>
+
+        <div class="reveal flex gap-3" style="transition-delay: 120ms">
+          <AppButton
+            variant="outline-muted"
+            size="icon-lg"
+            :href="profile.github"
+            external
+            icon="github"
+            aria-label="GitHub"
+          />
+          <AppButton
+            variant="outline-muted"
+            size="icon-lg"
+            :href="profile.telegram"
+            external
+            icon="send"
+            aria-label="Telegram"
+          />
+          <AppButton
+            variant="outline-muted"
+            size="icon-lg"
+            :href="`mailto:${profile.email}`"
+            icon="mail"
+            aria-label="Почта"
+          />
+        </div>
       </div>
 
-      <form
-        novalidate
-        class="reveal rounded-md border border-border bg-card p-7 md:p-[clamp(1.2rem,3vh,2.25rem)]"
-        style="transition-delay: 450ms"
-        @submit.prevent="submit"
-      >
-        <h3 class="font-display text-lg font-semibold tracking-tight text-foreground">
-          Написать сообщение
-        </h3>
-        <p class="mt-2 text-sm text-muted-foreground">
-          Расскажите про задачу — отвечу в тот же день.
-        </p>
+      <form novalidate class="reveal" style="transition-delay: 450ms" @submit.prevent="submit">
+        <h3 class="hidden">Написать сообщение</h3>
 
-        <div class="mt-[clamp(1rem,2.6vh,1.75rem)] space-y-[clamp(0.75rem,1.8vh,1.25rem)]">
+        <div class="space-y-[clamp(0.75rem,1.8vh,1.25rem)]">
           <div class="hidden" aria-hidden="true" tabindex="-1">
             <label for="cf-website">Не заполняйте</label>
             <input
@@ -219,10 +205,6 @@ onBeforeUnmount(() => {
         >
           {{ submitted ? 'Отправлено' : pending ? 'Отправка...' : 'Отправить' }}
         </AppButton>
-
-        <p class="mt-4 text-center text-xs text-muted-foreground">
-          Заявка уйдёт напрямую в Telegram — отвечу в тот же день.
-        </p>
       </form>
     </div>
 
