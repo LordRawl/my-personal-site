@@ -85,7 +85,7 @@ onBeforeUnmount(() => {
     id="contacts"
     class="screen grid-lines border-t border-border px-6 py-24 md:px-14 md:py-32 lg:py-10"
   >
-    <div class="grid gap-12 lg:grid-cols-[1fr_1fr]">
+    <div class="grid lg:grid-cols-[1fr_1fr]">
       <SectionHeading index="05" eyebrow="Контакты и ссылки" class="order-1">
         <template #title> Обсудим <span class="text-primary">задачу</span> </template>
         <template #note>
@@ -96,8 +96,8 @@ onBeforeUnmount(() => {
 
       <form
         novalidate
-        class="reveal order-2 rounded-md border border-border bg-card p-7 md:p-[clamp(1.2rem,3vh,2.25rem)] lg:col-start-2 lg:row-span-2"
-        style="transition-delay: 450ms"
+        class="reveal order-2 lg:col-start-2 lg:row-span-2"
+        style="transition-delay: 180ms"
         @submit.prevent="submit"
       >
         <h3 class="hidden">Написать сообщение</h3>
@@ -184,7 +184,7 @@ onBeforeUnmount(() => {
         </AppButton>
       </form>
 
-      <div class="order-3 flex gap-3 lg:col-start-1 lg:row-start-2 lg:mt-auto">
+      <div class="order-3 flex gap-3 mt-12 lg:col-start-1 lg:row-start-2 lg:mt-auto">
         <AppButton
           variant="outline-muted"
           size="icon-lg"
@@ -193,7 +193,7 @@ onBeforeUnmount(() => {
           icon="github"
           aria-label="GitHub"
           class="reveal"
-          style="transition-delay: 540ms"
+          style="transition-delay: 450ms"
         />
         <AppButton
           variant="outline-muted"
@@ -203,7 +203,7 @@ onBeforeUnmount(() => {
           icon="send"
           aria-label="Telegram"
           class="reveal"
-          style="transition-delay: 630ms"
+          style="transition-delay: 540ms"
         />
         <AppButton
           variant="outline-muted"
@@ -212,7 +212,7 @@ onBeforeUnmount(() => {
           icon="mail"
           aria-label="Почта"
           class="reveal"
-          style="transition-delay: 720ms"
+          style="transition-delay: 630ms"
         />
       </div>
     </div>
