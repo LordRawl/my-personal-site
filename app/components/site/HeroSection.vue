@@ -9,7 +9,10 @@ import { profile } from '~/data/profile'
     >
       <div class="copy">
         <div class="hero-eyebrow hero-fade hero-d2 mb-7 text-muted-foreground">
-          {{ profile.role }} · Vue&nbsp;3 / Nuxt
+          <span>
+            {{ profile.role }} ·
+            <nobr>Vue 3 / Nuxt</nobr>
+          </span>
         </div>
 
         <h1 class="hero-title font-display font-bold text-foreground">
