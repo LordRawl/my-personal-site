@@ -85,44 +85,21 @@ onBeforeUnmount(() => {
     id="contacts"
     class="screen grid-lines border-t border-border px-6 py-24 md:px-14 md:py-32 lg:py-10"
   >
-    <div class="grid gap-12 lg:grid-cols-[1fr_1fr] lg:gap-12">
-      <div class="flex flex-col justify-between">
-        <SectionHeading index="05" eyebrow="Контакты и ссылки">
-          <template #title> Обсудим <span class="text-primary">задачу</span> </template>
-          <template #note>
-            Открыт к удалённой работе, частичной занятости и проектным задачам. Отвечаю в течение
-            дня, срочное — сразу в Telegram.
-          </template>
-        </SectionHeading>
+    <div class="grid gap-12 lg:grid-cols-[1fr_1fr]">
+      <SectionHeading index="05" eyebrow="Контакты и ссылки" class="order-1">
+        <template #title> Обсудим <span class="text-primary">задачу</span> </template>
+        <template #note>
+          Открыт к удалённой работе, частичной занятости и проектным задачам. Отвечаю в течение дня,
+          срочное — сразу в Telegram.
+        </template>
+      </SectionHeading>
 
-        <div class="reveal flex gap-3" style="transition-delay: 120ms">
-          <AppButton
-            variant="outline-muted"
-            size="icon-lg"
-            :href="profile.github"
-            external
-            icon="github"
-            aria-label="GitHub"
-          />
-          <AppButton
-            variant="outline-muted"
-            size="icon-lg"
-            :href="profile.telegram"
-            external
-            icon="send"
-            aria-label="Telegram"
-          />
-          <AppButton
-            variant="outline-muted"
-            size="icon-lg"
-            :href="`mailto:${profile.email}`"
-            icon="mail"
-            aria-label="Почта"
-          />
-        </div>
-      </div>
-
-      <form novalidate class="reveal" style="transition-delay: 450ms" @submit.prevent="submit">
+      <form
+        novalidate
+        class="reveal order-2 rounded-md border border-border bg-card p-7 md:p-[clamp(1.2rem,3vh,2.25rem)] lg:col-start-2 lg:row-span-2"
+        style="transition-delay: 450ms"
+        @submit.prevent="submit"
+      >
         <h3 class="hidden">Написать сообщение</h3>
 
         <div class="space-y-[clamp(0.75rem,1.8vh,1.25rem)]">
@@ -206,6 +183,38 @@ onBeforeUnmount(() => {
           {{ submitted ? 'Отправлено' : pending ? 'Отправка...' : 'Отправить' }}
         </AppButton>
       </form>
+
+      <div class="order-3 flex gap-3 lg:col-start-1 lg:row-start-2 lg:mt-auto">
+        <AppButton
+          variant="outline-muted"
+          size="icon-lg"
+          :href="profile.github"
+          external
+          icon="github"
+          aria-label="GitHub"
+          class="reveal"
+          style="transition-delay: 540ms"
+        />
+        <AppButton
+          variant="outline-muted"
+          size="icon-lg"
+          :href="profile.telegram"
+          external
+          icon="send"
+          aria-label="Telegram"
+          class="reveal"
+          style="transition-delay: 630ms"
+        />
+        <AppButton
+          variant="outline-muted"
+          size="icon-lg"
+          :href="`mailto:${profile.email}`"
+          icon="mail"
+          aria-label="Почта"
+          class="reveal"
+          style="transition-delay: 720ms"
+        />
+      </div>
     </div>
 
     <Teleport to="body">

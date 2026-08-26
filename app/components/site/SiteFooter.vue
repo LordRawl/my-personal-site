@@ -31,32 +31,6 @@ import { navLinks, profile } from '~/data/profile'
 
       <div class="flex items-center gap-3">
         <AppButton
-          variant="outline-muted"
-          size="icon-lg"
-          :href="profile.github"
-          external
-          icon="github"
-          aria-label="GitHub"
-        />
-
-        <AppButton
-          variant="outline-muted"
-          size="icon-lg"
-          :href="profile.telegram"
-          external
-          icon="send"
-          aria-label="Telegram"
-        />
-
-        <AppButton
-          variant="outline-muted"
-          size="icon-lg"
-          :href="`mailto:${profile.email}`"
-          icon="mail"
-          aria-label="Почта"
-        />
-
-        <AppButton
           variant="primary"
           size="icon-lg"
           icon="arrow-up"
