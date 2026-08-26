@@ -13,10 +13,10 @@ export default defineNuxtConfig({
     },
   ],
   runtimeConfig: {
-    telegramBotToken: process.env.NUXT_TELEGRAM_BOT_TOKEN || '',
-    telegramChatId: process.env.NUXT_TELEGRAM_CHAT_ID || '',
+    telegramBotToken: '',
+    telegramChatId: '',
     public: {
-      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || '',
+      siteUrl: '',
     },
   },
   nitro: {
