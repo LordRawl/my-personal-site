@@ -13,11 +13,14 @@ export default defineNuxtConfig({
     },
   ],
   runtimeConfig: {
-    telegramBotToken: '',
-    telegramChatId: '',
+    telegramBotToken: process.env.NUXT_TELEGRAM_BOT_TOKEN || '',
+    telegramChatId: process.env.NUXT_TELEGRAM_CHAT_ID || '',
     public: {
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || '',
     },
+  },
+  nitro: {
+    preset: 'cloudflare-pages',
   },
   vite: {
     plugins: [tailwindcss()],
