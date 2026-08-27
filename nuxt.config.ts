@@ -19,9 +19,6 @@ export default defineNuxtConfig({
       siteUrl: '',
     },
   },
-  nitro: {
-    preset: 'vercel',
-  },
   vite: {
     plugins: [tailwindcss()],
   },
