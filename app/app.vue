@@ -48,11 +48,31 @@ useHead({
       }),
     },
   ],
+  noscript: [
+    {
+      innerHTML:
+        '<div><img src="https://mc.yandex.ru/watch/112000128" style="position:absolute;left:-9999px" alt=""/></div>',
+    },
+  ],
 })
 
 onMounted(() => {
   initTheme()
   initReveal()
+
+  const script = document.createElement('script')
+  script.async = true
+  script.src = 'https://mc.yandex.ru/metrika/tag.js'
+  document.head.appendChild(script)
+  script.onload = () => {
+    ;(window as any).ym(112000128, 'init', {
+      defer: true,
+      clickmap: true,
+      trackLinks: true,
+      accurateTrackBounce: true,
+      webvisor: true,
+    })
+  }
 })
 </script>
 
