@@ -1,5 +1,4 @@
 {
-  "framework": "nuxt",
-  "buildCommand": "npm run build",
-  "outputDirectory": ".vercel/output/static"
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npm run build"
 }
