@@ -16,12 +16,17 @@ import { profile } from '~/data/profile'
         </div>
 
         <h1 class="hero-title font-display font-bold text-foreground">
-          <span class="ln"><span>Сложный продукт —</span></span>
           <span class="ln">
-            <span>простой&nbsp;</span>
-            <span> и&nbsp;<em class="not-italic text-primary">быстрый</em></span>
+            <span> Разработка</span>
           </span>
-          <span class="ln"> <span>интерфейс</span></span>
+
+          <span class="ln">
+            <span>и&nbsp;проектирование</span>
+          </span>
+
+          <span class="ln">
+            <span> <em class="not-italic text-primary">интерфейсов</em></span>
+          </span>
 
           <span class="sr-only">
             &nbsp;— резюме Ивана Есина, фронтенд-разработчика на&nbsp;Vue и&nbsp;Nuxt
@@ -29,11 +34,10 @@ import { profile } from '~/data/profile'
         </h1>
 
         <p
-          class="hero-fade hero-d3 mt-7 max-w-[53ch] text-lg leading-relaxed text-muted-foreground"
+          class="hero-fade hero-d3 mt-7 max-w-[53ch] text-lg leading-relaxed text-muted-foreground font-bold"
         >
-          9&nbsp;лет опыта и&nbsp;80+ проектов: от&nbsp;лендингов до&nbsp;высоконагруженных панелей
-          с&nbsp;<b class="font-medium text-foreground">10&nbsp;000+ элементов на&nbsp;экране</b>.
-          <br />Ключевой ревьюер команды: архитектура, стандарты качества, миграция на&nbsp;FSD.
+          9&nbsp;лет в&nbsp;frontend-разработке, 80+&nbsp;проектов — от&nbsp;одностраничных
+          лендингов до&nbsp;высоконагруженных систем с&nbsp;тысячами элементов на&nbsp;экране.
         </p>
 
         <div class="hero-fade hero-d4 mt-10 flex flex-wrap items-center gap-5">
@@ -80,6 +84,7 @@ import { profile } from '~/data/profile'
       <span>{{ profile.city }}</span>
       <a
         href="#about"
+        aria-label="Листать к разделу «Обо мне»"
         class="flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
         @click.prevent="scrollToSection('about')"
       >

@@ -1,7 +1,7 @@
 export const profile = {
   name: 'Иван Есин',
   fullName: 'Есин Иван Павлович',
-  role: 'Фронтенд-разработчик',
+  role: 'Frontend-разработчик',
   city: 'Краснодар · удалённо',
   telegram: 'https://t.me/lordrawl',
   telegramHandle: '@lordrawl',
@@ -14,8 +14,8 @@ export const profile = {
 
 export const navLinks = [
   { id: 'about', label: 'Обо мне' },
-  { id: 'stack', label: 'Стек' },
   { id: 'works', label: 'Проекты' },
+  { id: 'stack', label: 'Стек' },
   { id: 'experience', label: 'Опыт' },
   { id: 'contacts', label: 'Контакты' },
 ]

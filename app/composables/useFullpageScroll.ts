@@ -1,4 +1,6 @@
-const SECTION_IDS = ['hero', 'about', 'stack', 'works', 'experience', 'contacts']
+import { navLinks } from '~/data/profile.ts'
+
+const SECTION_IDS = ['hero', ...navLinks.map(({ id }) => id)]
 
 type Point = { el: HTMLElement; top: number }
 
@@ -13,16 +15,26 @@ export const useFullpageScroll = () => {
   let rafId = 0
   let cooldownUntil = 0
 
-  const maxScroll = () => document.documentElement.scrollHeight - window.innerHeight
-  const docHeight = () => document.documentElement.scrollHeight
-  const headerH = () => (document.querySelector('header') as HTMLElement | null)?.offsetHeight ?? 76
+  let cachedPoints: Point[] = []
+  let cachedMaxScroll = 0
+  let cachedDocHeight = 0
+  let cachedHeaderH = 76
 
-  const points = (): Point[] => {
+  const measure = () => {
     const sy = window.scrollY
-    return SECTION_IDS.map((id) => document.getElementById(id))
+    const vh = window.innerHeight
+    cachedPoints = SECTION_IDS.map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => Boolean(el))
       .map((el) => ({ el, top: el.getBoundingClientRect().top + sy }))
+    cachedMaxScroll = document.documentElement.scrollHeight - vh
+    cachedDocHeight = document.documentElement.scrollHeight
+    cachedHeaderH = (document.querySelector('header') as HTMLElement | null)?.offsetHeight ?? 76
   }
+
+  const maxScroll = () => cachedMaxScroll
+  const docHeight = () => cachedDocHeight
+  const headerH = () => cachedHeaderH
+  const points = (): Point[] => cachedPoints
 
   const targetFor = (p: Point) => {
     const vh = window.innerHeight
@@ -178,14 +190,21 @@ export const useFullpageScroll = () => {
     const id = (e as CustomEvent<string>).detail
     const el = document.getElementById(id)
     if (!el) return
-    animateTo(targetFor({ el, top: el.getBoundingClientRect().top + window.scrollY }))
+    const p = cachedPoints.find((x) => x.el === el)
+    animateTo(targetFor(p ?? { el, top: el.getBoundingClientRect().top + window.scrollY }))
+  }
+
+  const onResize = () => {
+    measure()
   }
 
   const attach = () => {
     enabled = true
+    measure()
     window.addEventListener('wheel', onWheel, { passive: false })
     window.addEventListener('keydown', onKey)
     window.addEventListener('fullpage-nav', onNav)
+    window.addEventListener('resize', onResize)
   }
 
   const detach = () => {
@@ -194,6 +213,7 @@ export const useFullpageScroll = () => {
     window.removeEventListener('wheel', onWheel)
     window.removeEventListener('keydown', onKey)
     window.removeEventListener('fullpage-nav', onNav)
+    window.removeEventListener('resize', onResize)
   }
 
   const onMediaChange = () => {

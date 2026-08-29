@@ -16,7 +16,8 @@ const toggle = (i: number) => {
     <SectionHeading index="04" eyebrow="Опыт работы">
       <template #title> Девять лет <span class="text-primary">в проде</span> </template>
       <template #note>
-        Таймлайн: от вёрстки сайтов до высоконагруженных интерфейсов и внутренней дизайн-системы.
+        Таймлайн: от вёрстки сайтов до высоконагруженных интерфейсов и&nbsp;внутренней
+        дизайн-системы.
       </template>
     </SectionHeading>
 

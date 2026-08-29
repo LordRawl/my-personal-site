@@ -7,7 +7,7 @@ import { skillCategories, everydaySkills, marqueeItems } from '~/data/skills'
     id="stack"
     class="screen grid-lines border-t border-border px-6 py-24 md:px-14 md:py-32 lg:py-10"
   >
-    <SectionHeading index="02" eyebrow="Стек и навыки">
+    <SectionHeading index="03" eyebrow="Стек и навыки">
       <template #title> Инструменты, которыми <span class="text-primary">работаю</span> </template>
     </SectionHeading>
 

@@ -7,58 +7,66 @@ import { stats, features } from '~/data/about'
     id="about"
     class="screen grid-lines border-t border-border px-6 py-24 md:px-14 md:py-32 lg:py-10"
   >
-    <SectionHeading index="01" eyebrow="Обо мне">
-      <template #title>
-        От вёрстки до <span class="text-primary">архитектуры</span>: что я приношу команде
-      </template>
-      <template #note>
-        Фронтенд-разработчик с 9+ годами опыта: прошёл путь от вёрстки до продуктовой разработки и
-        реализовал больше 80 проектов — от лендингов до порталов.
-      </template>
-    </SectionHeading>
+    <div class="grid gap-14 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12 items-center">
+      <div class="">
+        <SectionHeading index="01" eyebrow="Обо мне">
+          <template #title>
+            От интерфейса до
+            <span class="text-primary">архитектуры</span>: закрываю frontend-задачи целиком
+          </template>
+          <template #note>
+            Помогаю продуктовым командам создавать быстрые, масштабируемые интерфейсы
+            и&nbsp;доводить сложные задачи от идеи до production.
+          </template>
+        </SectionHeading>
 
-    <div class="grid gap-14 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12">
-      <div class="space-y-[clamp(0.75rem,2vh,1.5rem)]">
-        <p
-          class="reveal text-[1.05rem] leading-relaxed text-foreground/90"
-          style="transition-delay: 90ms"
-        >
-          Убеждён, что отличный интерфейс — это сочетание продуманного UX, живой ненавязчивой
-          анимации и чистого, протестированного кода. Стремлюсь к минималистичным и производительным
-          решениям, минимизируя количество сторонних библиотек.
-        </p>
-        <p class="reveal leading-relaxed text-muted-foreground" style="transition-delay: 180ms">
-          Понимаю баланс между техническим перфекционизмом и необходимостью быстро закрывать
-          бизнес-потребности. Рассматриваю Senior-позиции в продуктовых командах: углубление в
-          архитектуру с перспективой Tech Lead.
-        </p>
+        <div class="space-y-[clamp(0.75rem,2vh,1.5rem)]">
+          <p
+            class="reveal text-[1.05rem] leading-relaxed text-foreground/90 max-w-2xl"
+            style="transition-delay: 90ms"
+          >
+            Разбираюсь в продуктовой задаче, проектирую frontend-архитектуру, слежу
+            за&nbsp;производительностью и качеством кода.
+          </p>
 
-        <div
-          class="reveal grid grid-cols-2 gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-4"
-          style="transition-delay: 270ms"
-        >
+          <p
+            class="reveal leading-relaxed text-muted-foreground max-w-[46rem]"
+            style="transition-delay: 180ms"
+          >
+            Строю решения, которые удобно развивать дальше: понятная архитектура, переиспользуемые
+            компоненты, предсказуемые интеграции и минимум лишних зависимостей
+          </p>
+
           <div
-            v-for="stat in stats"
-            :key="stat.label"
-            class="bg-card px-5 py-[clamp(0.9rem,2.4vh,1.5rem)]"
+            class="reveal grid grid-cols-2 gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-4"
+            style="transition-delay: 270ms"
           >
-            <div class="font-display text-2xl font-bold tracking-tight text-primary">
-              {{ stat.value }}
+            <div
+              v-for="stat in stats"
+              :key="stat.label"
+              class="bg-card px-5 py-[clamp(0.9rem,2.4vh,1.5rem)]"
+            >
+              <div class="font-display text-2xl font-bold tracking-tight text-primary">
+                {{ stat.value }}
+              </div>
+              <div class="mt-2 text-xs leading-snug text-muted-foreground">{{ stat.label }}</div>
             </div>
-            <div class="mt-2 text-xs leading-snug text-muted-foreground">{{ stat.label }}</div>
           </div>
-        </div>
 
-        <div class="reveal flex flex-wrap items-center gap-4 pt-2" style="transition-delay: 360ms">
-          <AppButton
-            size="md"
-            variant="outline-muted"
-            href="https://cdn.poehali.dev/projects/9373486b-8e69-4402-921f-18c7875ec1f7/bucket/e83e94cf-dad1-4c79-ba4b-ad83582fe97b.pdf"
-            external
-            prefix-icon="file-text"
+          <div
+            class="reveal flex flex-wrap items-center gap-4 pt-2"
+            style="transition-delay: 360ms"
           >
-            Скачать резюме PDF
-          </AppButton>
+            <AppButton
+              size="md"
+              variant="outline-muted"
+              href="https://cdn.poehali.dev/projects/9373486b-8e69-4402-921f-18c7875ec1f7/bucket/e83e94cf-dad1-4c79-ba4b-ad83582fe97b.pdf"
+              external
+              prefix-icon="file-text"
+            >
+              Скачать резюме PDF
+            </AppButton>
+          </div>
         </div>
       </div>
 

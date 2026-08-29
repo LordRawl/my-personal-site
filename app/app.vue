@@ -74,8 +74,8 @@ onMounted(() => {
     <main>
       <HeroSection />
       <AboutSection />
-      <StackSection />
       <WorksSection @open="activeProject = $event" />
+      <StackSection />
       <ExperienceSection />
       <ContactsSection />
     </main>

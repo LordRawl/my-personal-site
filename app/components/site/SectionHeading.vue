@@ -21,7 +21,7 @@ defineProps<{
     </h2>
     <p
       v-if="$slots.note"
-      class="mt-4 max-w-[52ch] text-[0.95rem] leading-relaxed text-muted-foreground lg:mt-[clamp(0.5rem,1.6vh,1.25rem)]"
+      class="mt-4 max-w-[60ch] text-[0.95rem] leading-relaxed text-muted-foreground lg:mt-[clamp(0.5rem,1.6vh,1.25rem)]"
     >
       <slot name="note" />
     </p>

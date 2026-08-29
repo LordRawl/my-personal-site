@@ -10,7 +10,7 @@ const emit = defineEmits<{ open: [project: Project] }>()
     id="works"
     class="screen grid-lines border-t border-border px-6 py-24 md:px-14 md:py-32 lg:py-10"
   >
-    <SectionHeading index="03" eyebrow="Проекты / портфолио">
+    <SectionHeading index="02" eyebrow="Проекты / портфолио">
       <template #title> Что я <span class="text-primary">делал</span> руками </template>
       <template #note>
         Шесть ключевых проектов 2017—2026 годов. Нажмите на карточку — внутри детали задачи и стек.
