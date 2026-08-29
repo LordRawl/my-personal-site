@@ -145,7 +145,7 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    min-height: 100svh;
+    min-height: calc(100svh - var(--header-h, 0px));
   }
 }
 

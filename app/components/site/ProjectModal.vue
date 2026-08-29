@@ -63,6 +63,8 @@ onBeforeUnmount(() => {
           <div class="mt-1 text-sm text-muted-foreground">{{ project.metric.label }}</div>
         </div>
 
+        <p class="leading-snug tracking-tight text-foreground font-bold text-sm">Мой вклад:</p>
+
         <ul class="space-y-3">
           <li
             v-for="detail in project.details"

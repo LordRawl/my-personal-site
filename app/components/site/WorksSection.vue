@@ -13,7 +13,8 @@ const emit = defineEmits<{ open: [project: Project] }>()
     <SectionHeading index="02" eyebrow="Проекты / портфолио">
       <template #title> Что я <span class="text-primary">делал</span> руками </template>
       <template #note>
-        Шесть ключевых проектов 2017—2026 годов. Нажмите на карточку — внутри детали задачи и стек.
+        Шесть ключевых проектов из 80+ — от highload SPA и Design System до marketplace и ERP.
+        Внутри — задачи, решения, мой вклад и стек.
       </template>
     </SectionHeading>
 

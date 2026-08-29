@@ -20,6 +20,10 @@ export const useFullpageScroll = () => {
   let cachedDocHeight = 0
   let cachedHeaderH = 76
 
+  const applyHeaderVar = (h: number) => {
+    document.documentElement.style.setProperty('--header-h', `${Math.round(h)}px`)
+  }
+
   const measure = () => {
     const sy = window.scrollY
     const vh = window.innerHeight
@@ -29,6 +33,7 @@ export const useFullpageScroll = () => {
     cachedMaxScroll = document.documentElement.scrollHeight - vh
     cachedDocHeight = document.documentElement.scrollHeight
     cachedHeaderH = (document.querySelector('header') as HTMLElement | null)?.offsetHeight ?? 76
+    applyHeaderVar(cachedHeaderH)
   }
 
   const maxScroll = () => cachedMaxScroll
@@ -38,7 +43,13 @@ export const useFullpageScroll = () => {
 
   const targetFor = (p: Point) => {
     const vh = window.innerHeight
-    return Math.round(p.el.offsetHeight > vh ? p.top - headerH() : p.top)
+    const header = Math.max(headerH(), 0)
+    // Всегда прижимаем верх секции к нижней границе шапки,
+    // чтобы заголовок секции не прятался под фиксированной шапкой.
+    const base = p.top - header
+    // Если секция целиком помещается в область под шапкой — позиционируем
+    // её верх ровно под шапкой (без обрезки снизу), иначе верх остаётся под шапкой.
+    return Math.round(Math.max(0, Math.min(base, maxScroll())))
   }
 
   const currentIndex = (list: Point[]) => {
@@ -50,21 +61,18 @@ export const useFullpageScroll = () => {
     return idx
   }
 
-  const nextTarget = (sy: number, list: Point[]): number | null => {
-    for (const p of list) {
-      if (p.top > sy + 2) return targetFor(p)
-    }
+  const nextTarget = (list: Point[], from: number): number | null => {
+    for (let i = from + 1; i < list.length; i++) return targetFor(list[i]!)
     return null
   }
 
-  const prevTarget = (sy: number, list: Point[]): number | null => {
-    for (let i = list.length - 1; i >= 0; i--) {
-      if (list[i]!.top < sy - 2) return targetFor(list[i]!)
-    }
+  const prevTarget = (list: Point[], from: number): number | null => {
+    for (let i = from - 1; i >= 0; i--) return targetFor(list[i]!)
     return null
   }
 
   const decide = (dir: 1 | -1): number | null => {
+    measure()
     const sy = window.scrollY
     const vh = window.innerHeight
     const list = points()
@@ -74,8 +82,20 @@ export const useFullpageScroll = () => {
     if (dir === 1) {
       if (sy >= maxScroll() - 1) return null
       const bottomLine = item.top + item.el.offsetHeight - vh
-      if (sy < bottomLine - 1 && !(sy + vh >= docHeight() - 1)) return null
-      const target = nextTarget(sy, list)
+      const atPageBottom = sy + vh >= docHeight() - 1
+      // Native-скролл внутри секции допускаем только для секций, чей контент
+      // выше области вьюпорта под шапкой (vh - header), где низ не помещается
+      // даже при снапе верха под шапку. Обычные секции (min-height: vh - header)
+      // помещаются целиком — один тик = один снап.
+      const area = vh - headerH()
+      // Секция считается «высокой» (нужен native-скролл внутри) только если её
+      // контент заметно (более чем на 20%) выше области под шапкой. Секции,
+      // чуть-чуть не влезающие (случайные паддинги), всё равно снапятся за один
+      // тик — нижние отступы обычно не критичны.
+      const isTall = item.el.offsetHeight > area * 1.2
+      if (isTall && sy < bottomLine - 1 && !atPageBottom) return null
+      const idx = currentIndex(list)
+      const target = nextTarget(list, idx)
       if (target !== null) {
         if (target <= sy + 1) return null
         return target
@@ -87,7 +107,8 @@ export const useFullpageScroll = () => {
     if (sy <= 1) return null
     const atPageBottom = sy + vh >= docHeight() - 1
     if (!atPageBottom && sy > item.top + 1) return null
-    const target = prevTarget(sy, list)
+    const idx = currentIndex(list)
+    const target = prevTarget(list, idx)
     if (target === null) return null
     return target
   }
