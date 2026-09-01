@@ -2,7 +2,11 @@ export const scrollToSection = (id: string, options?: { fullpage?: boolean }) =>
   if (options?.fullpage && window.matchMedia('(min-width: 1024px)').matches) {
     window.dispatchEvent(new CustomEvent('fullpage-nav', { detail: id }))
   } else {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+    const el = document.getElementById(id)
+    if (!el) return
+    const headerH = (document.querySelector('header') as HTMLElement | null)?.offsetHeight ?? 76
+    const y = Math.max(0, el.getBoundingClientRect().top + window.scrollY - headerH)
+    window.scrollTo({ top: y, behavior: 'smooth' })
   }
 }
 

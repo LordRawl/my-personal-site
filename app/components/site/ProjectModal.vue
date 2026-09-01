@@ -30,7 +30,7 @@ onBeforeUnmount(() => {
 <template>
   <Teleport to="body">
     <Transition name="modal-overlay">
-      <div v-if="project" class="fixed inset-0 z-50 bg-black/80" @click.self="emit('close')" />
+      <div v-if="project" class="fixed inset-0 z-[60] bg-black/80" @click.self="emit('close')" />
     </Transition>
 
     <Transition name="modal-content">
@@ -38,7 +38,7 @@ onBeforeUnmount(() => {
         v-if="project"
         role="dialog"
         aria-modal="true"
-        class="fixed left-[50%] top-[50%] z-50 grid max-h-[86vh] w-full max-w-2xl translate-x-[-50%] translate-y-[-50%] gap-4 overflow-y-auto border border-border bg-card p-6 shadow-lg sm:rounded-lg"
+        class="fixed left-[50%] top-[50%] z-[60] grid max-h-[86vh] w-full max-w-2xl translate-x-[-50%] translate-y-[-50%] gap-4 overflow-y-auto border border-border bg-card p-6 shadow-lg sm:rounded-lg"
       >
         <div class="flex flex-col space-y-1.5 text-center sm:text-left">
           <span

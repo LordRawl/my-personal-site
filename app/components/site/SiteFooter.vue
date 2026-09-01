@@ -13,7 +13,7 @@ import { navLinks, profile } from '~/data/profile'
           {{ profile.name }}
         </div>
         <p class="mt-3 max-w-[38ch] text-sm text-muted-foreground">
-          {{ profile.role }} · Vue 3, Nuxt, TypeScript. {{ profile.city }}.
+          {{ profile.role }} · Vue 3, Nuxt, TypeScript.
         </p>
       </div>
 

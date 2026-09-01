@@ -211,6 +211,7 @@ export const useFullpageScroll = () => {
     const id = (e as CustomEvent<string>).detail
     const el = document.getElementById(id)
     if (!el) return
+    measure()
     const p = cachedPoints.find((x) => x.el === el)
     animateTo(targetFor(p ?? { el, top: el.getBoundingClientRect().top + window.scrollY }))
   }
@@ -221,6 +222,8 @@ export const useFullpageScroll = () => {
 
   const attach = () => {
     enabled = true
+    measure()
+    applyHeaderVar(cachedHeaderH)
     measure()
     window.addEventListener('wheel', onWheel, { passive: false })
     window.addEventListener('keydown', onKey)

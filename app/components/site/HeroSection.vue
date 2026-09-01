@@ -81,11 +81,10 @@ import { profile } from '~/data/profile'
     <div
       class="hero-fade hero-d4 flex items-center justify-between border-t border-border px-6 py-5 text-xs uppercase tracking-[0.22em] text-muted-foreground md:px-14"
     >
-      <span>{{ profile.city }}</span>
       <a
         href="#about"
         aria-label="Листать к разделу «Обо мне»"
-        class="flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
+        class="flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground ml-auto"
         @click.prevent="scrollToSection('about')"
       >
         <span class="hidden sm:inline">Листать</span>
