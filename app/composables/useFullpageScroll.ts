@@ -246,6 +246,8 @@ export const useFullpageScroll = () => {
   }
 
   onMounted(() => {
+    cachedHeaderH = (document.querySelector('header') as HTMLElement | null)?.offsetHeight ?? 76
+    applyHeaderVar(cachedHeaderH)
     if (desktop.matches) attach()
     desktop.addEventListener('change', onMediaChange)
   })

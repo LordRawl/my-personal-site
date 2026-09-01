@@ -4,7 +4,12 @@ export const scrollToSection = (id: string, options?: { fullpage?: boolean }) =>
   } else {
     const el = document.getElementById(id)
     if (!el) return
-    const headerH = (document.querySelector('header') as HTMLElement | null)?.offsetHeight ?? 76
+    // Используем --header-h (высота свернутой шапки), а не offsetHeight в момент
+    // клика: при открытом мобильном меню шапка имеет h-full, и замер дал бы полный
+    // экран вместо реальной высоты, сломав позицию секции.
+    const headerH =
+      Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) ||
+      ((document.querySelector('header') as HTMLElement | null)?.offsetHeight ?? 76)
     const y = Math.max(0, el.getBoundingClientRect().top + window.scrollY - headerH)
     window.scrollTo({ top: y, behavior: 'smooth' })
   }
