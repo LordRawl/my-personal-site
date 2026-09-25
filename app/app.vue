@@ -11,13 +11,7 @@ const siteUrl = (useRuntimeConfig().public.siteUrl as string) || ''
 
 useHead({
   link: siteUrl ? [{ rel: 'canonical', href: siteUrl }] : [],
-  meta: [
-    siteUrl ? { property: 'og:url', content: siteUrl } : null,
-    {
-      name: 'google-site-verification',
-      content: 'xSeYgeF_lxWylJDxBHUZTDwAJfciqJ4YFRmWECZcs84',
-    },
-  ],
+  meta: [siteUrl ? { property: 'og:url', content: siteUrl } : null],
   script: [
     {
       type: 'application/ld+json',

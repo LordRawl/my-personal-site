@@ -65,10 +65,12 @@ export default defineNuxtConfig({
           content: '9 лет опыта, 80+ проектов: высоконагруженные интерфейсы, дизайн-система, SSR',
         },
         { name: 'twitter:image', content: '/og.png' },
+        {
+          name: 'google-site-verification',
+          content: 'D8pwAXJQOWb-_5Fuy9wRscagleLgr7qV5wpDaF-wbI4',
+        },
       ],
-      link: [
-        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
-      ],
+      link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
       script: [
         {
           innerHTML: `try{var t=localStorage.getItem('theme');document.documentElement.classList.toggle('dark',t!=='light')}catch(e){document.documentElement.classList.add('dark')}`,
