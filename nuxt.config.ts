@@ -70,7 +70,14 @@ export default defineNuxtConfig({
           content: 'D8pwAXJQOWb-_5Fuy9wRscagleLgr7qV5wpDaF-wbI4',
         },
       ],
-      link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
+      link: [
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicons/favicon.svg' },
+        { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicons/favicon-16x16.png' },
+        { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicons/favicon-32x32.png' },
+        { rel: 'icon', type: 'image/png', sizes: '48x48', href: '/favicons/favicon-48x48.png' },
+        { rel: 'icon', type: 'image/png', sizes: '192x192', href: '/favicons/favicon-192x192.png' },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/favicons/favicon-180x180.png' },
+      ],
       script: [
         {
           innerHTML: `try{var t=localStorage.getItem('theme');document.documentElement.classList.toggle('dark',t!=='light')}catch(e){document.documentElement.classList.add('dark')}`,
