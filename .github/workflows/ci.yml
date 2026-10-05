@@ -92,6 +92,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      # deploy.sh лежит в репозитории, а не в артефакте: сборка пакует только
+      # .output и ecosystem.config.cjs. Без checkout скрипта нет в рабочей
+      # папке раннера, и scp падает с "stat local ...: No such file".
+      - uses: actions/checkout@v4
+
       - uses: actions/download-artifact@v4
         with:
           name: devivan-output
