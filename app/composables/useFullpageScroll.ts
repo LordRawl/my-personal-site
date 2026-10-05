@@ -42,7 +42,6 @@ export const useFullpageScroll = () => {
   const points = (): Point[] => cachedPoints
 
   const targetFor = (p: Point) => {
-    const vh = window.innerHeight
     const header = Math.max(headerH(), 0)
     // Всегда прижимаем верх секции к нижней границе шапки,
     // чтобы заголовок секции не прятался под фиксированной шапкой.

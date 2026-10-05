@@ -1,0 +1,130 @@
+# Сборка и деплой devivan.tech (резюме).
+#
+# Три job с зависимостями: verify -> build -> deploy.
+# Сборка идёт на GitHub-hosted раннерах, на сервер едет только артефакт
+# .output: Node там ничего не собирает, а просто запускает готовые файлы.
+#
+# Секреты (Settings -> Secrets and variables -> Actions):
+#   DEPLOY_HOST     IP сервера
+#   DEPLOY_USER     ssh-пользователь (deploy)
+#   DEPLOY_SSH_KEY  приватный ключ без пароля
+#   DEPLOY_PATH     путь на сервере (/var/www/devivan)
+#   SITE_URL        публичный адрес сайта, попадает в runtimeConfig.public
+
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Два деплоя одновременно перетирали бы друг друга.
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  verify:
+    name: Проверки
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      # npm ci, а не npm install: точная версия из package-lock.json.
+      # lockfile не должен меняться здесь, иначе расхождение с локальной
+      # версией соберётся на проде.
+      - run: npm ci
+
+      - run: npm run lint
+
+  build:
+    name: Сборка
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - run: npm ci
+
+      # Сборка на раннере требует около 2 ГБ RAM, на бесплатном ubuntu-latest
+      # памяти с запасом. Файл .env в репозитории нет (он в .gitignore),
+      # поэтому публичный адрес передаём переменной окружения: nuxt.config
+      # читает его в runtimeConfig.public.
+      - name: Собираю .output
+        env:
+          NUXT_PUBLIC_SITE_URL: ${{ secrets.SITE_URL }}
+        run: npm run build
+
+      # Архивируем .output целиком: внутри уже лежат рантайм-зависимости,
+      # поэтому на сервере не нужен npm ci для запуска приложения.
+      - name: Архивирую артефакт
+        run: |
+          tar -czf devivan-output.tar.gz .output deploy/ecosystem.config.cjs
+          du -h devivan-output.tar.gz
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: devivan-output
+          path: devivan-output.tar.gz
+          retention-days: 7
+
+  deploy:
+    name: Деплой на сервер
+    needs: build
+    # Секреты недоступны на ветках из форков, и запускать деплой оттуда нельзя:
+    # ключ сервера не должен попасть в чужие руки.
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: devivan-output
+
+      - name: Готовлю SSH
+        run: |
+          install -m 700 -d ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Копирую артефакт и скрипт на сервер
+        env:
+          HOST: ${{ secrets.DEPLOY_HOST }}
+          USER: ${{ secrets.DEPLOY_USER }}
+          PATH_ON_SERVER: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          scp devivan-output.tar.gz "$USER@$HOST:/tmp/devivan-output.tar.gz"
+          scp deploy/deploy.sh "$USER@$HOST:$PATH_ON_SERVER/deploy.sh"
+          ssh "$USER@$HOST" "chmod +x $PATH_ON_SERVER/deploy.sh"
+
+      - name: Распаковываю и деплою
+        env:
+          HOST: ${{ secrets.DEPLOY_HOST }}
+          USER: ${{ secrets.DEPLOY_USER }}
+          PATH_ON_SERVER: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          ssh "$USER@$HOST" <<EOF
+          set -euo pipefail
+          cd $PATH_ON_SERVER
+          rm -rf /tmp/devivan-output
+          mkdir -p /tmp/devivan-output
+          tar -xzf /tmp/devivan-output.tar.gz -C /tmp/devivan-output
+          BUNDLE=/tmp/devivan-output BRANCH=\${GITHUB_SHA:-main} bash ./deploy.sh
+          rm -rf /tmp/devivan-output /tmp/devivan-output.tar.gz
+          EOF
