@@ -118,7 +118,10 @@ jobs:
           PATH_ON_SERVER: ${{ secrets.DEPLOY_PATH }}
           REMOTE_TAR: /tmp/devivan-output-${{ github.run_id }}.tar.gz
         run: |
-          SSH_OPTS="-o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=20"
+          # -i обязателен вместе с IdentitiesOnly: без него ssh не станет
+          # искать ключ в ~/.ssh и предъявит ни одного, отсюда
+          # "Permission denied (publickey,password)".
+          SSH_OPTS="-i ~/.ssh/id_deploy -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=20"
           scp $SSH_OPTS devivan-output.tar.gz "$USER@$HOST:$REMOTE_TAR"
           scp $SSH_OPTS deploy/deploy.sh "$USER@$HOST:$PATH_ON_SERVER/deploy.sh"
           ssh $SSH_OPTS "$USER@$HOST" "chmod +x $PATH_ON_SERVER/deploy.sh"
@@ -130,7 +133,7 @@ jobs:
           PATH_ON_SERVER: ${{ secrets.DEPLOY_PATH }}
           REMOTE_TAR: /tmp/devivan-output-${{ github.run_id }}.tar.gz
         run: |
-          SSH_OPTS="-o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=20"
+          SSH_OPTS="-i ~/.ssh/id_deploy -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=20"
           ssh $SSH_OPTS "$USER@$HOST" <<EOF
           set -euo pipefail
           cd $PATH_ON_SERVER
