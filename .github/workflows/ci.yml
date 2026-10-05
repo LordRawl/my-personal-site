@@ -96,11 +96,19 @@ jobs:
         with:
           name: devivan-output
 
+      # Ключ обязательно чистим от CR. GitHub хранит секреты из <textarea>, где
+      # браузер нормализует переводы строк в \r\n, а ssh такой ключ не
+      # разбирает: он молча игнорируется, и вызов падает с
+      # "Permission denied (publickey,password)" — ключ при этом вовсе не
+      # виден в списке предъявленных.
+      # IdentitiesOnly не даёт ssh подставлять другие ключи раннера, из-за
+      # чего неверный ключ выглядел бы как «сервер не пускает».
       - name: Готовлю SSH
         run: |
           install -m 700 -d ~/.ssh
-          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_deploy
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_deploy
           chmod 600 ~/.ssh/id_deploy
+          ssh-keygen -y -f ~/.ssh/id_deploy > /dev/null
           ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
 
       - name: Копирую артефакт и скрипт на сервер
@@ -108,23 +116,28 @@ jobs:
           HOST: ${{ secrets.DEPLOY_HOST }}
           USER: ${{ secrets.DEPLOY_USER }}
           PATH_ON_SERVER: ${{ secrets.DEPLOY_PATH }}
+          REMOTE_TAR: /tmp/devivan-output-${{ github.run_id }}.tar.gz
         run: |
-          scp devivan-output.tar.gz "$USER@$HOST:/tmp/devivan-output.tar.gz"
-          scp deploy/deploy.sh "$USER@$HOST:$PATH_ON_SERVER/deploy.sh"
-          ssh "$USER@$HOST" "chmod +x $PATH_ON_SERVER/deploy.sh"
+          SSH_OPTS="-o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=20"
+          scp $SSH_OPTS devivan-output.tar.gz "$USER@$HOST:$REMOTE_TAR"
+          scp $SSH_OPTS deploy/deploy.sh "$USER@$HOST:$PATH_ON_SERVER/deploy.sh"
+          ssh $SSH_OPTS "$USER@$HOST" "chmod +x $PATH_ON_SERVER/deploy.sh"
 
       - name: Распаковываю и деплою
         env:
           HOST: ${{ secrets.DEPLOY_HOST }}
           USER: ${{ secrets.DEPLOY_USER }}
           PATH_ON_SERVER: ${{ secrets.DEPLOY_PATH }}
+          REMOTE_TAR: /tmp/devivan-output-${{ github.run_id }}.tar.gz
         run: |
-          ssh "$USER@$HOST" <<EOF
+          SSH_OPTS="-o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=20"
+          ssh $SSH_OPTS "$USER@$HOST" <<EOF
           set -euo pipefail
           cd $PATH_ON_SERVER
-          rm -rf /tmp/devivan-output
-          mkdir -p /tmp/devivan-output
-          tar -xzf /tmp/devivan-output.tar.gz -C /tmp/devivan-output
-          BUNDLE=/tmp/devivan-output BRANCH=\${GITHUB_SHA:-main} bash ./deploy.sh
-          rm -rf /tmp/devivan-output /tmp/devivan-output.tar.gz
+          STAGE=/tmp/devivan-unpack-$GITHUB_RUN_ID
+          rm -rf "\$STAGE"
+          mkdir -p "\$STAGE"
+          tar -xzf $REMOTE_TAR -C "\$STAGE"
+          BUNDLE="\$STAGE" BRANCH=\${GITHUB_SHA:-main} bash ./deploy.sh
+          rm -rf "\$STAGE" $REMOTE_TAR
           EOF

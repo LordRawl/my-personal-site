@@ -56,8 +56,11 @@ rm -rf .output.new
 cp -a "$ARTIFACT" .output.new
 
 # 3. Переключение одним переименованием. Предыдущую версию сохраняем: она
-#    нужна для отката.
+#    нужна для отката. Старый .output.prev удаляем ДО переноса, иначе mv
+#    уводит .output внутрь существующего каталога .output.prev и падает с
+#    "Directory not empty" — то есть начиная со второго деплоя.
 log "переключаюсь на новую версию"
+rm -rf .output.prev
 [ -d .output ] && mv .output .output.prev
 mv .output.new .output
 
