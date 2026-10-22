@@ -11,11 +11,3 @@ export const profile = {
   resumeUrl:
     'https://cdn.poehali.dev/projects/9373486b-8e69-4402-921f-18c7875ec1f7/bucket/e83e94cf-dad1-4c79-ba4b-ad83582fe97b.pdf',
 }
-
-export const navLinks = [
-  { id: 'about', label: 'Обо мне' },
-  { id: 'works', label: 'Проекты' },
-  { id: 'stack', label: 'Стек' },
-  { id: 'experience', label: 'Опыт' },
-  { id: 'contacts', label: 'Контакты' },
-]
