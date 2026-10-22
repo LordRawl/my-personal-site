@@ -1,177 +1,154 @@
 <script setup lang="ts">
-import { experience, education } from '~/data/experience'
-
-const openIndex = ref<number | null>(0)
-
-const toggle = (i: number) => {
-  openIndex.value = openIndex.value === i ? null : i
-}
+const jobs = [
+  { meta: 'Краснодар · окт. 2024 — наст. время', company: 'Cognitech', text: 'Ключевой ревьюер, миграция на FSD.' },
+  { meta: 'Санкт-Петербург · июнь 2021 — сент. 2024', company: 'Skycoach', text: 'Запуск маркетплейса, JWT, SSR ради SEO, админ-панель.' },
+  { meta: 'Москва · нояб. 2017 — май 2021', company: 'Like Центр', text: 'Десятки лендингов, ключевая роль в ERP, наставничество.' },
+  { meta: 'Удалённо · янв. — нояб. 2017', company: 'Начало пути', text: 'HTML-верстальщик.' },
+]
 </script>
 
 <template>
-  <section
-    id="experience"
-    class="screen grid-lines border-t border-border px-6 py-24 md:px-14 md:py-32 lg:py-10"
-  >
-    <SectionHeading index="04" eyebrow="Опыт работы">
-      <template #title> Девять лет <span class="text-primary">в проде</span> </template>
-      <template #note>
-        Таймлайн: от вёрстки сайтов до высоконагруженных интерфейсов и&nbsp;внутренней
-        дизайн-системы.
-      </template>
-    </SectionHeading>
-
-    <div class="relative">
-      <span
-        class="absolute left-[7px] top-2 hidden h-[calc(100%-16px)] w-px bg-border md:block"
-        aria-hidden="true"
-      />
-
-      <div class="space-y-4">
-        <div
-          v-for="(item, i) in experience"
-          :key="item.company"
-          class="reveal relative border-b-0 md:pl-12"
-          :style="{ transitionDelay: `${90 + i * 90}ms` }"
-        >
-          <span
-            class="absolute left-0 top-7 hidden h-[15px] w-[15px] items-center justify-center rounded-full border border-border bg-background md:flex"
-            aria-hidden="true"
-          >
-            <span
-              :class="
-                openIndex === i
-                  ? 'hero-mark-dot block h-[7px] w-[7px] rounded-full bg-primary'
-                  : 'block h-[7px] w-[7px] rounded-full bg-border'
-              "
-            />
-          </span>
-
-          <div
-            class="overflow-hidden rounded-md border transition-colors duration-300 hover:border-primary/40"
-            :class="openIndex === i ? 'border-border bg-card' : 'border-border bg-card'"
-          >
-            <h3 class="flex">
-              <button
-                type="button"
-                :aria-expanded="openIndex === i"
-                class="flex flex-1 items-center justify-between px-6 py-[clamp(0.9rem,2.2vh,1.5rem)] cursor-pointer text-left font-medium transition-all hover:no-underline md:px-8 [&[aria-expanded=true]>svg]:rotate-180"
-                @click="toggle(i)"
-              >
-                <div
-                  class="flex w-full flex-col gap-3 pr-4 md:flex-row md:items-center md:justify-between md:gap-8"
-                >
-                  <div>
-                    <div class="flex flex-wrap items-center gap-3">
-                      <span
-                        class="font-display text-lg font-semibold tracking-tight text-foreground"
-                      >
-                        {{ item.company }}
-                      </span>
-                      <span
-                        v-if="item.current"
-                        class="rounded-full bg-primary px-2.5 py-0.5 text-[11px] font-semibold text-primary-foreground"
-                      >
-                        сейчас
-                      </span>
-                    </div>
-                    <p class="mt-1.5 text-sm text-muted-foreground">
-                      {{ item.role }} · {{ item.place }}
-                    </p>
-                  </div>
-                  <div class="text-left md:text-right">
-                    <div class="font-body text-sm text-foreground">
-                      {{ periodLabel(item.period) }}
-                    </div>
-                    <div class="mt-1 text-xs text-muted-foreground">
-                      {{ periodDuration(item.period) }}
-                    </div>
-                  </div>
-                </div>
-                <AppIcon
-                  name="chevron-down"
-                  :size="16"
-                  class="h-4 w-4 shrink-0 transition-transform duration-200"
-                />
-              </button>
-            </h3>
-
-            <div
-              class="grid transition-[grid-template-rows] duration-300 ease-out"
-              :style="{ gridTemplateRows: openIndex === i ? '1fr' : '0fr' }"
-            >
-              <div class="overflow-hidden">
-                <div class="px-6 pb-7 pt-0 md:px-8">
-                  <div
-                    class="mb-5 border-t border-border pt-5 font-display text-xs uppercase tracking-[0.14em] text-primary"
-                  >
-                    {{ item.stack }}
-                  </div>
-                  <ul class="space-y-3">
-                    <li
-                      v-for="point in item.points"
-                      :key="point"
-                      class="flex gap-3 text-sm leading-relaxed text-muted-foreground"
-                    >
-                      <AppIcon name="minus" :size="15" class="mt-1 flex-none text-primary" />
-                      <span>{{ point }}</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+  <section id="experience" class="xp" aria-labelledby="xh">
+    <div class="xp__torn" aria-hidden="true">
+      <svg viewBox="0 0 1440 100" preserveAspectRatio="none">
+        <path id="tornp" fill="#170d08" d="" />
+        <path
+          id="tornl"
+          fill="none"
+          stroke="#E73228"
+          stroke-width="3"
+          vector-effect="non-scaling-stroke"
+          d=""
+        />
+      </svg>
     </div>
 
-    <div
-      class="reveal mt-[clamp(1.5rem,4vh,3.5rem)] grid gap-px overflow-hidden rounded-md border border-border bg-border md:grid-cols-3"
-      style="transition-delay: 450ms"
-    >
-      <div class="bg-card p-[clamp(1.1rem,2.6vh,1.75rem)]">
-        <div class="flex items-center gap-3 text-primary">
-          <AppIcon name="graduation-cap" />
-          <span class="font-display text-sm font-semibold uppercase tracking-[0.14em]"
-            >Образование</span
-          >
-        </div>
-        <p class="mt-4 text-sm leading-relaxed text-foreground">{{ education.university }}</p>
-        <p class="mt-2 text-sm text-muted-foreground">
-          {{ education.faculty }}, {{ education.year }}
-        </p>
+    <div class="xp__grid">
+      <div class="xp__head">
+        <p class="mono">(04) Опыт</p>
+        <h2 id="xh" class="xp__heading">Девять лет в проде</h2>
       </div>
 
-      <div class="bg-card p-[clamp(1.1rem,2.6vh,1.75rem)]">
-        <div class="flex items-center gap-3 text-primary">
-          <AppIcon name="book-open" />
-          <span class="font-display text-sm font-semibold uppercase tracking-[0.14em]">Курсы</span>
-        </div>
-        <ul class="mt-4 space-y-2">
-          <li
-            v-for="course in education.courses"
-            :key="course"
-            class="text-sm leading-relaxed text-muted-foreground"
-          >
-            {{ course }}
-          </li>
-        </ul>
+      <div id="tl" class="xp__tl">
+        <svg id="tsvg" aria-hidden="true">
+          <path id="tbase" fill="none" stroke="rgba(243,233,223,.2)" stroke-width="3" />
+          <path id="tprog" fill="none" stroke="#E73228" stroke-width="3" />
+          <circle id="tdot" r="10" fill="#E73228" />
+        </svg>
+
+        <article v-for="j in jobs" :key="j.company" class="xp__job">
+          <p class="mono xp__job-meta">{{ j.meta }}</p>
+          <h3 class="xp__job-title">{{ j.company }}</h3>
+          <p class="xp__job-text">{{ j.text }}</p>
+        </article>
       </div>
 
-      <div class="bg-card p-[clamp(1.1rem,2.6vh,1.75rem)]">
-        <div class="flex items-center gap-3 text-primary">
-          <AppIcon name="languages" />
-          <span class="font-display text-sm font-semibold uppercase tracking-[0.14em]">Языки</span>
+      <div class="xp__meta">
+        <div class="xp__meta-card">
+          <p class="mono xp__meta-label">Образование</p>
+          <p class="xp__meta-value">Уральский федеральный университет, 2015</p>
         </div>
-        <ul class="mt-4 space-y-2">
-          <li v-for="lang in education.languages" :key="lang" class="text-sm text-muted-foreground">
-            {{ lang }}
-          </li>
-        </ul>
-        <p class="mt-6 border-t border-border pt-4 text-sm text-muted-foreground">
-          Рекомендации от руководителей Skycoach и Like Центр — по запросу.
-        </p>
+        <div class="xp__meta-card">
+          <p class="mono xp__meta-label">Курсы</p>
+          <p class="xp__meta-value">Vue 3 (JavaScript.Ninja, 2022), HTML Academy (2021) и другие</p>
+        </div>
+        <div class="xp__meta-card">
+          <p class="mono xp__meta-label">Языки</p>
+          <p class="xp__meta-value">Русский (родной), английский (A2). Рекомендации по запросу.</p>
+        </div>
       </div>
     </div>
   </section>
 </template>
+
+<style>
+.xp {
+  position: relative;
+  background: var(--bg2);
+  padding: 14vh var(--pad) 36vh;
+}
+.xp__torn {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -13vh;
+  height: 14vh;
+  pointer-events: none;
+}
+.xp__torn svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.xp__grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 2rem;
+}
+.xp__head {
+  grid-column: 1 / 6;
+}
+.xp__heading {
+  grid-column: 1 / 6;
+  align-self: start;
+  position: sticky;
+  top: 18vh;
+  margin: 1rem 0 0;
+  font: 900 clamp(2rem, 5.4vw, 5rem) / 1 var(--fd);
+}
+.xp__tl {
+  grid-column: 6 / 13;
+  position: relative;
+  padding-left: 5rem;
+}
+.xp__tl svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+.xp__job {
+  padding: 0 0 4.5rem;
+}
+.xp__job-title {
+  margin: 0.3rem 0 0.6rem;
+  font: 700 clamp(1.2rem, 2vw, 1.7rem) / 1.15 var(--fd);
+}
+.xp__job-meta,
+.xp__job-text {
+  margin: 0;
+  max-width: 34rem;
+}
+.xp__meta {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2rem;
+  margin-top: 3rem;
+}
+.xp__meta-card {
+  border: 1px solid rgba(243, 233, 223, 0.2);
+  border-radius: 1.2rem;
+  padding: 1.4rem;
+}
+.xp__meta-label,
+.xp__meta-value {
+  margin: 0.4rem 0 0;
+}
+@media (max-width: 800px) {
+  .xp__head,
+  .xp__tl {
+    grid-column: 1 / -1;
+  }
+  .xp__heading {
+    position: static;
+  }
+  .xp__meta {
+    grid-template-columns: 1fr;
+  }
+  .xp__tl {
+    padding-left: 3.5rem;
+  }
+}
+</style>

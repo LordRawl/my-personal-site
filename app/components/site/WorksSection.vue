@@ -1,86 +1,182 @@
-<script setup lang="ts">
-import { projects } from '~/data/projects'
-import type { Project } from '~/types/site'
-
-const emit = defineEmits<{ open: [project: Project] }>()
-</script>
-
 <template>
-  <section
-    id="works"
-    class="screen grid-lines border-t border-border px-6 py-24 md:px-14 md:py-32 lg:py-10"
-  >
-    <SectionHeading index="02" eyebrow="Проекты / портфолио">
-      <template #title> Что я <span class="text-primary">делал</span> руками </template>
-      <template #note>
-        Шесть ключевых проектов из 80+ — от highload SPA и Design System до marketplace и ERP.
-        Внутри — задачи, решения, мой вклад и стек.
-      </template>
-    </SectionHeading>
+  <section id="works" class="works" aria-labelledby="wk">
+    <div class="works__drops" aria-hidden="true">
+      <svg id="dropsvg" viewBox="0 0 100 34" preserveAspectRatio="xMidYMax slice" fill="#f3e9df" />
+    </div>
 
-    <div
-      class="grid gap-px overflow-hidden rounded-md border border-border bg-border md:grid-cols-2 xl:grid-cols-3"
-    >
-      <div
-        v-for="(project, i) in projects"
-        :key="project.id"
-        class="reveal"
-        :style="{ transitionDelay: `${90 + i * 90}ms` }"
-      >
-        <button
-          class="min-h-full min-w-full group cursor-pointer relative flex flex-col items-start gap-[clamp(0.7rem,1.8vh,1.25rem)] bg-card p-7 text-left transition-colors duration-300 hover:bg-secondary md:p-[clamp(1.1rem,2.6vh,2rem)]"
-          @click="emit('open', project)"
-        >
-          <span
-            class="absolute right-6 top-6 font-display text-xs tabular-nums text-muted-foreground/60"
-          >
-            {{ String(i + 1).padStart(2, '0') }}
-          </span>
+    <p class="mono works__kicker">(02) Проекты</p>
+    <h2 id="wk" class="works__heading">Что я делал руками</h2>
 
-          <span
-            class="inline-flex items-center gap-2 rounded-full border border-primary/40 px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-primary"
-          >
-            {{ project.tag }}
-          </span>
+    <!-- Картинки раскладываются плагином: так вся логика модалки остаётся в одном месте. -->
+    <div id="grid" class="works__grid" />
 
-          <h3
-            class="max-w-[22ch] font-display text-xl font-semibold leading-snug tracking-tight text-foreground"
-          >
-            {{ project.title }}
-          </h3>
-
-          <p class="text-sm leading-relaxed text-muted-foreground">{{ project.summary }}</p>
-
-          <div class="mt-auto w-full space-y-4 pt-4">
-            <div class="flex flex-wrap gap-2">
-              <span
-                v-for="tech in project.stack.slice(0, 4)"
-                :key="tech"
-                class="rounded-sm bg-secondary px-2.5 py-1 text-[11px] text-muted-foreground transition-colors group-hover:text-foreground"
-              >
-                {{ tech }}
-              </span>
-            </div>
-
-            <div class="flex items-center justify-between border-t border-border pt-4">
-              <span class="text-xs text-muted-foreground"
-                >{{ project.company }} · {{ project.year }}</span
-              >
-              <span
-                class="inline-flex items-center gap-1.5 font-display text-xs font-semibold text-primary"
-              >
-                Подробнее
-
-                <AppIcon
-                  name="arrow-right"
-                  :size="13"
-                  class="transition-transform duration-300 group-hover:translate-x-1"
-                />
-              </span>
-            </div>
-          </div>
-        </button>
-      </div>
+    <div class="works__wave" aria-hidden="true">
+      <svg viewBox="0 0 1440 200" preserveAspectRatio="none">
+        <path id="wavepath" fill="#0b0705" d="" />
+        <path
+          id="wavestroke"
+          fill="none"
+          stroke="#E73228"
+          stroke-width="3"
+          vector-effect="non-scaling-stroke"
+          d=""
+        />
+      </svg>
     </div>
   </section>
 </template>
+
+<style>
+.works {
+  position: relative;
+  background: var(--cream);
+  color: var(--dk);
+  padding: 18vh var(--pad) 28vh;
+  isolation: isolate;
+}
+.works__drops {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -34vh;
+  height: 34vh;
+  pointer-events: none;
+  overflow: hidden;
+}
+.works__drops svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.works__kicker {
+  color: #5a4637;
+}
+.works__heading {
+  margin: 1rem 0 4rem;
+  font: 900 clamp(2rem, 6.4vw, 6rem) / 0.98 var(--fd);
+  max-width: 12ch;
+}
+.works__grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1.5rem;
+}
+.works__card {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  text-align: left;
+  border-radius: 1.4rem;
+  padding: 1.6rem;
+  min-height: 16rem;
+  background: #fff8f1;
+  border: 1.5px solid var(--dk);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.35s var(--ease);
+  --x: 50%;
+  --y: 50%;
+  color: var(--dk);
+}
+.works__card:hover,
+.works__card:focus-visible {
+  transform: translateY(-6px) rotate(-0.4deg);
+}
+.works__meta {
+  position: relative;
+  display: block;
+  color: #5a4637;
+}
+.works__title {
+  position: relative;
+  display: block;
+  margin: 0.5rem 0;
+  font: 700 clamp(1.05rem, 1.6vw, 1.45rem) / 1.15 var(--fd);
+}
+.works__desc {
+  position: relative;
+  display: block;
+}
+.works__go {
+  position: relative;
+  display: block;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.works__card:hover .works__go,
+.works__card:focus-visible .works__go {
+  z-index: 2;
+}
+.works__peek {
+  position: absolute;
+  inset: 0;
+  background: var(--acc);
+  padding: 1.6rem;
+  display: flex;
+  align-items: flex-end;
+  font-weight: 700;
+  clip-path: circle(0 at var(--x) var(--y));
+  transition: clip-path 0.6s var(--ease);
+  pointer-events: none;
+}
+.works__card:hover .works__peek,
+.works__card:focus-visible .works__peek {
+  clip-path: circle(150% at var(--x) var(--y));
+}
+.works__card--dark {
+  background: var(--dk);
+  color: var(--cream);
+}
+.works__card--dark .works__meta {
+  color: var(--mute);
+}
+.works__card:nth-child(1) {
+  grid-column: 1 / 8;
+}
+.works__card:nth-child(2) {
+  grid-column: 8 / 13;
+  margin-top: 4rem;
+}
+.works__card:nth-child(3) {
+  grid-column: 2 / 7;
+}
+.works__card:nth-child(4) {
+  grid-column: 7 / 12;
+  margin-top: 3rem;
+}
+.works__card:nth-child(5) {
+  grid-column: 1 / 6;
+  margin-top: 1rem;
+}
+.works__card:nth-child(6) {
+  grid-column: 6 / 13;
+}
+.works__wave {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 22vh;
+  pointer-events: none;
+}
+.works__wave svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+@media (max-width: 800px) {
+  .works__card:nth-child(n) {
+    grid-column: 1 / -1;
+    margin: 0;
+  }
+  .works__peek {
+    position: static;
+    clip-path: none;
+    padding: 0.8rem 0 0;
+    background: none;
+    display: block;
+  }
+}
+</style>

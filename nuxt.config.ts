@@ -6,6 +6,18 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ['~/assets/css/main.css'],
   modules: ['@nuxt/eslint', '@nuxt/fonts'],
+  fonts: {
+    processCSSVariables: true,
+    families: [
+      { name: 'Unbounded', provider: 'google', weights: [700, 900], subsets: ['cyrillic', 'latin'] },
+      {
+        name: 'JetBrains Mono',
+        provider: 'google',
+        weights: [400, 500, 700],
+        subsets: ['cyrillic', 'latin'],
+      },
+    ],
+  },
   components: [
     {
       path: '~/components',
@@ -34,8 +46,7 @@ export default defineNuxtConfig({
             'Frontend-разработчик: 9 лет опыта, 80+ проектов на Vue 3, Nuxt и TypeScript. Высоконагруженные интерфейсы, дизайн-система, SSR. Открыт к удалённой работе.',
         },
         { name: 'author', content: 'Иван Есин' },
-        { name: 'theme-color', media: '(prefers-color-scheme: light)', content: '#f7f2ee' },
-        { name: 'theme-color', media: '(prefers-color-scheme: dark)', content: '#0b0705' },
+        { name: 'theme-color', content: '#0b0705' },
         {
           property: 'og:title',
           content: 'Frontend-разработчик Иван Есин — Vue 3, Nuxt, TypeScript',
@@ -77,11 +88,6 @@ export default defineNuxtConfig({
         { rel: 'icon', type: 'image/png', sizes: '48x48', href: '/favicons/favicon-48x48.png' },
         { rel: 'icon', type: 'image/png', sizes: '192x192', href: '/favicons/favicon-192x192.png' },
         { rel: 'apple-touch-icon', sizes: '180x180', href: '/favicons/favicon-180x180.png' },
-      ],
-      script: [
-        {
-          innerHTML: `try{var t=localStorage.getItem('theme');document.documentElement.classList.toggle('dark',t!=='light')}catch(e){document.documentElement.classList.add('dark')}`,
-        },
       ],
     },
   },
