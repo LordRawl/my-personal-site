@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { marqueeRows } from '~/data/skills'
+
 const isles = [
   { title: 'Frontend', items: ['Vue 2/3', 'Nuxt 2/3', 'TypeScript', 'Pinia', 'Quasar', 'Tailwind', 'React', 'jQuery', 'Bootstrap', 'SVG-анимации'] },
   { title: 'Сборка', items: ['Vite', 'Webpack', 'Gulp', 'Parcel'] },
@@ -14,9 +16,17 @@ const isles = [
     <p class="mono stack__kicker">(03) Стек</p>
     <h2 id="st1" class="stack__heading">Инструменты, которыми работаю</h2>
 
-    <!-- Декоративные бегущие строки: наполняются плагином, от AT скрыты. -->
-    <div class="stack__mq" data-dir="-1" aria-hidden="true" />
-    <div class="stack__mq stack__mq--reverse" data-dir="1" aria-hidden="true" />
+    <!-- Строка едет на -50%, поэтому список продублирован: на стыке копий нет шва. -->
+    <div class="stack__mq" data-dir="-1" aria-hidden="true">
+      <ul v-for="copy in 2" :key="copy" class="stack__mq-track">
+        <li v-for="item in marqueeRows[0]" :key="item" class="stack__mq-tag">{{ item }}</li>
+      </ul>
+    </div>
+    <div class="stack__mq stack__mq--reverse" data-dir="1" aria-hidden="true">
+      <ul v-for="copy in 2" :key="copy" class="stack__mq-track">
+        <li v-for="item in marqueeRows[1]" :key="item" class="stack__mq-tag">{{ item }}</li>
+      </ul>
+    </div>
 
     <div class="stack__isles">
       <div v-for="i in isles" :key="i.title" class="stack__isle">

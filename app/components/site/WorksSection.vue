@@ -1,3 +1,16 @@
+<script setup lang="ts">
+import { projects } from '~/data/projects'
+
+const { open } = useProjectDialog()
+
+const trackPointer = (e: PointerEvent) => {
+  const el = e.currentTarget as HTMLElement
+  const r = el.getBoundingClientRect()
+  el.style.setProperty('--x', `${e.clientX - r.left}px`)
+  el.style.setProperty('--y', `${e.clientY - r.top}px`)
+}
+</script>
+
 <template>
   <section id="works" class="works" aria-labelledby="wk">
     <div class="works__drops" aria-hidden="true">
@@ -7,8 +20,29 @@
     <p class="mono works__kicker">(02) Проекты</p>
     <h2 id="wk" class="works__heading">Что я делал руками</h2>
 
-    <!-- Картинки раскладываются плагином: так вся логика модалки остаётся в одном месте. -->
-    <div id="grid" class="works__grid" />
+    <div id="grid" class="works__grid">
+      <article
+        v-for="(p, i) in projects"
+        :key="p.id"
+        class="works__card"
+        :class="{ 'works__card--dark': i === 3 }"
+        @pointermove="trackPointer"
+      >
+        <span>
+          <span class="mono works__meta">{{ p.tag }} · {{ p.company }} · {{ p.year }}</span>
+          <h3 class="works__title">{{ p.title }}</h3>
+          <span class="works__desc">{{ p.summary }}</span>
+        </span>
+        <span class="works__peek">{{ p.stack.join(' · ') }}</span>
+        <span class="works__go">Подробнее →</span>
+        <button
+          type="button"
+          class="works__hit"
+          :aria-label="`Подробнее: ${p.title}`"
+          @click="open(p, $event)"
+        />
+      </article>
+    </div>
 
     <div class="works__wave" aria-hidden="true">
       <svg viewBox="0 0 1440 200" preserveAspectRatio="none">
@@ -79,8 +113,7 @@
   --y: 50%;
   color: var(--dk);
 }
-.works__card:hover,
-.works__card:focus-visible {
+.works__card:hover {
   transform: translateY(-6px) rotate(-0.4deg);
 }
 .works__meta {
@@ -105,10 +138,6 @@
   text-decoration: underline;
   text-underline-offset: 4px;
 }
-.works__card:hover .works__go,
-.works__card:focus-visible .works__go {
-  z-index: 2;
-}
 .works__peek {
   position: absolute;
   inset: 0;
@@ -122,8 +151,21 @@
   pointer-events: none;
 }
 .works__card:hover .works__peek,
-.works__card:focus-visible .works__peek {
+.works__card:has(.works__hit:focus-visible) .works__peek {
   clip-path: circle(150% at var(--x) var(--y));
+}
+.works__hit {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: 1.4rem;
+}
+.works__hit:focus-visible {
+  outline: 3px solid var(--acc);
+  outline-offset: -4px;
 }
 .works__card--dark {
   background: var(--dk);

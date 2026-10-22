@@ -1,14 +1,68 @@
+<script setup lang="ts">
+import { gsap } from 'gsap'
+
+const { project, origin, close } = useProjectDialog()
+const { stop, start } = useSmoothScroll()
+
+const dlg = ref<HTMLDialogElement | null>(null)
+
+watch(project, async (p) => {
+  const el = dlg.value
+  if (!el) return
+  if (!p) {
+    if (el.open) el.close()
+    return
+  }
+  await nextTick()
+  if (!el.open) el.showModal()
+  stop()
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  const r = el.getBoundingClientRect()
+  gsap.fromTo(
+    el,
+    { clipPath: `circle(0px at ${origin.value.x - r.left}px ${origin.value.y - r.top}px)` },
+    {
+      clipPath: `circle(150% at ${origin.value.x - r.left}px ${origin.value.y - r.top}px)`,
+      duration: 0.7,
+      ease: 'power3.out',
+      clearProps: 'clipPath',
+    },
+  )
+})
+
+onMounted(() => {
+  const el = dlg.value
+  if (!el) return
+  el.addEventListener('close', () => {
+    start()
+    if (project.value) project.value = null
+  })
+  el.addEventListener('click', (e) => {
+    if (e.target === el) close()
+  })
+})
+
+onBeforeUnmount(() => start())
+</script>
+
 <template>
-  <dialog id="dlg" class="dialog" data-lenis-prevent aria-labelledby="dt">
-    <div class="dialog__body">
-      <button id="dx" class="dialog__close" type="button">Закрыть ✕</button>
-      <p id="dm" class="mono dialog__meta" />
-      <h3 id="dt" class="dialog__title" />
-      <p id="dd" class="dialog__desc" />
-      <div id="dmetric" class="dialog__metric" hidden />
+  <dialog id="dlg" ref="dlg" class="dialog" data-lenis-prevent aria-labelledby="dt">
+    <div v-if="project" class="dialog__body">
+      <button class="dialog__close" type="button" @click="close">Закрыть ✕</button>
+      <p class="mono dialog__meta">{{ project.tag }} · {{ project.company }} · {{ project.year }}</p>
+      <h3 id="dt" class="dialog__title">{{ project.title }}</h3>
+      <p id="dd" class="dialog__desc">{{ project.summary }}</p>
+      <div class="dialog__metric">
+        <b class="dialog__metric-value">{{ project.metric.value }}</b>
+        <span class="dialog__metric-label">{{ project.metric.label }}</span>
+      </div>
       <p class="dialog__label">Мой вклад</p>
-      <ul id="ddetails" class="dialog__details" />
-      <ul id="dc" class="dialog__chips" />
+      <ul class="dialog__details">
+        <li v-for="d in project.details" :key="d" class="dialog__detail">{{ d }}</li>
+      </ul>
+      <ul class="dialog__chips">
+        <li v-for="s in project.stack" :key="s" class="dialog__chip">{{ s }}</li>
+      </ul>
     </div>
   </dialog>
 </template>

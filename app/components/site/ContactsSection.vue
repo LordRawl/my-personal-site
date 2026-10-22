@@ -1,3 +1,63 @@
+<script setup lang="ts">
+const name = ref('')
+const contact = ref('')
+const message = ref('')
+const website = ref('')
+const status = ref('')
+const busy = ref(false)
+const invalid = ref({ name: false, contact: false, message: false })
+
+const nameEl = ref<HTMLInputElement | null>(null)
+const contactEl = ref<HTMLInputElement | null>(null)
+const messageEl = ref<HTMLTextAreaElement | null>(null)
+
+const t0 = import.meta.client ? Date.now() : 0
+
+const submit = async () => {
+  if (busy.value) return
+  invalid.value = {
+    name: name.value.trim().length < 2,
+    contact: contact.value.trim().length < 3,
+    message: message.value.trim().length < 10,
+  }
+  const el = invalid.value.name
+    ? nameEl
+    : invalid.value.contact
+      ? contactEl
+      : invalid.value.message
+        ? messageEl
+        : null
+  if (el) {
+    el.value?.focus()
+    status.value = 'Проверьте поля: имя от 2, контакт от 3, задача от 10 символов.'
+    return
+  }
+  busy.value = true
+  status.value = 'Отправляю…'
+  try {
+    const res = await $fetch<{ ok?: boolean }>('/api/contact', {
+      method: 'POST',
+      body: {
+        name: name.value,
+        contact: contact.value,
+        message: message.value,
+        website: website.value,
+        loadTime: t0,
+      },
+    })
+    if (!res.ok) throw new Error('send failed')
+    status.value = 'Готово: заявка отправлена. Отвечу в ближайшее время.'
+    name.value = ''
+    contact.value = ''
+    message.value = ''
+  } catch {
+    status.value = 'Не получилось отправить. Напишите в Telegram: @lordrawl'
+  } finally {
+    busy.value = false
+  }
+}
+</script>
+
 <template>
   <section id="contacts" class="contacts" aria-labelledby="ch">
     <p class="mono contacts__kicker">(05) Контакты</p>
@@ -15,25 +75,44 @@
         </ul>
       </div>
 
-      <form id="form" class="contacts__form" novalidate>
-        <label class="contacts__field">Имя<input name="name" autocomplete="name" required /></label>
+      <form id="form" class="contacts__form" novalidate @submit.prevent="submit">
+        <label class="contacts__field"
+          >Имя<input
+            ref="nameEl"
+            v-model="name"
+            name="name"
+            autocomplete="name"
+            :aria-invalid="invalid.name"
+            required
+        /></label>
         <label class="contacts__field"
           >Контакт
           <input
+            ref="contactEl"
+            v-model="contact"
             name="contact"
             autocomplete="off"
             placeholder="Telegram или e-mail"
+            :aria-invalid="invalid.contact"
             required
           /></label
         >
-        <label class="contacts__field">Задача<textarea name="message" rows="4" required /></label>
+        <label class="contacts__field"
+          >Задача<textarea
+            ref="messageEl"
+            v-model="message"
+            name="message"
+            rows="4"
+            :aria-invalid="invalid.message"
+            required
+        /></label>
 
         <div class="contacts__hp" aria-hidden="true">
-          <label>Не заполняйте<input name="website" tabindex="-1" autocomplete="off" /></label>
+          <label>Не заполняйте<input v-model="website" name="website" tabindex="-1" autocomplete="off" /></label>
         </div>
 
-        <button class="btn btn--big" data-magnet type="submit">Отправить</button>
-        <p id="st" class="contacts__status" role="status" aria-live="polite" />
+        <button class="btn btn--big" data-magnet type="submit" :disabled="busy">Отправить</button>
+        <p id="st" class="contacts__status" role="status" aria-live="polite">{{ status }}</p>
       </form>
     </div>
   </section>
@@ -122,6 +201,10 @@
 }
 .contacts .btn:hover {
   background: #2a1a12;
+}
+.contacts .btn:disabled {
+  opacity: 0.6;
+  cursor: progress;
 }
 .contacts__status {
   min-height: 1.6em;

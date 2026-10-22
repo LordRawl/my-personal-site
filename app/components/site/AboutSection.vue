@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const { refresh } = useScrollRefresh()
+
 const cards = [
   {
     title: 'Продуктовый подход',
@@ -17,6 +19,14 @@ const cards = [
     text: 'Code review, рефакторинг, миграция. В Cognitech — ключевой ревьюер и миграция проекта на FSD.',
   },
 ]
+
+const open = ref<boolean[]>(cards.map(() => false))
+
+const toggle = (i: number) => {
+  open.value[i] = !open.value[i]
+  // Карточка меняет высоту и сдвигает всё ниже — ScrollTrigger держит старые позиции.
+  window.setTimeout(() => refresh(), 500)
+}
 </script>
 
 <template>
@@ -63,12 +73,23 @@ const cards = [
     </ul>
 
     <div class="about__cards">
-      <article v-for="c in cards" :key="c.title" class="about__card">
-        <button type="button" class="about__toggle" aria-expanded="false">
+      <article
+        v-for="(c, i) in cards"
+        :key="c.title"
+        class="about__card"
+        :class="{ 'about__card--open': open[i] }"
+      >
+        <button
+          type="button"
+          class="about__toggle"
+          :aria-expanded="open[i]"
+          :aria-controls="`abody-${i}`"
+          @click="toggle(i)"
+        >
           {{ c.title }}
           <i class="about__icon" aria-hidden="true" />
         </button>
-        <div class="about__body"><div><p>{{ c.text }}</p></div></div>
+        <div :id="`abody-${i}`" class="about__body"><div><p>{{ c.text }}</p></div></div>
       </article>
     </div>
   </section>

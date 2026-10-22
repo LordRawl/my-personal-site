@@ -72,21 +72,7 @@ export const everydaySkills = [
   'REST API',
 ]
 
-export const marqueeItems = [
-  'Vue 3',
-  'Nuxt 3',
-  'TypeScript',
-  'Vite',
-  'Pinia',
-  'Quasar',
-  'SCSS',
-  'Tailwind',
-  'WebSockets',
-  'REST API',
-  'FSD',
-  'Vitest',
-  'Figma',
-  'Node.js',
-  'Git Flow',
-  'SVG',
+export const marqueeRows = [
+  ['Vue 3', 'Nuxt', 'TypeScript', 'Pinia', 'Quasar', 'Tailwind', 'Vite', 'Vitest'],
+  ['WebSockets', 'REST API', 'FSD', 'Figma', 'SSR', 'Design System', 'Pixel Perfect', 'БЭМ'],
 ]

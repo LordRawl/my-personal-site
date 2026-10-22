@@ -1,131 +1,12 @@
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
+import { useSmoothScroll } from '~/composables/useSmoothScroll'
 
 const $ = <T extends Element = Element>(sel: string, root?: ParentNode): T | null =>
   (root ?? document).querySelector(sel) as T | null
 const $$ = <T extends Element = Element>(sel: string, root?: ParentNode): T[] =>
   Array.from((root ?? document).querySelectorAll(sel)) as T[]
-
-type Project = {
-  tag: string
-  company: string
-  year: string
-  title: string
-  summary: string
-  metric: { value: string; label: string }
-  details: string[]
-  stack: string[]
-}
-
-const PROJECTS: Project[] = [
-  {
-    tag: 'Highload SPA',
-    company: 'Cognitech',
-    year: '2024 — сейчас',
-    title: 'Панель управления сетевым оборудованием',
-    summary:
-      'Коммерческий высоконагруженный веб-сервис для настройки сетевого оборудования: дашборды, таблицы и формы с одновременным выводом 10 000+ элементов.',
-    metric: { value: '10 000+', label: 'элементов в одном экране' },
-    details: [
-      'Сложные экраны с большим объёмом данных: виртуализация таблиц, отложенный рендер, аккуратная работа с реактивностью.',
-      'Автономные модули со сложной бизнес-логикой и реальным временем на WebSockets.',
-      'Миграция существующего кода на архитектуру FSD без остановки поставки фич.',
-      'Участие в проектировании архитектуры и технических решений для ключевых модулей.',
-    ],
-    stack: ['Vue 3', 'TypeScript', 'Vite', 'Quasar', 'Pinia', 'WebSockets'],
-  },
-  {
-    tag: 'Design System',
-    company: 'Cognitech',
-    year: '2025',
-    title: 'Внутренняя библиотека UI-компонентов',
-    summary:
-      'Развивал внутреннюю дизайн-систему для продуктовой команды: проектировал API компонентов, документацию и тестовую инфраструктуру.',
-    metric: { value: 'Единый UI', label: 'одна библиотека компонентов для всей команды' },
-    details: [
-      'Проектирование публичного API компонентов: предсказуемые пропсы, слоты и события.',
-      'Документация (README) и примеры использования для каждой единицы библиотеки.',
-      'Покрытие тестами на Vitest и Vue Test Utils.',
-      'Ревью внедрений и помощь командам при переходе на общие компоненты.',
-    ],
-    stack: ['Vue 3', 'TypeScript', 'Vitest', 'Vue Test Utils', 'SCSS'],
-  },
-  {
-    tag: 'MARKETPLACE · SSR',
-    company: 'Skycoach',
-    year: '2023 — 2024',
-    title: 'Маркетплейс игровых товаров',
-    summary:
-      'Запуск маркетплейса игровых товаров с каталогом, сделками, личным кабинетом и SEO-ориентированными страницами.',
-    metric: { value: 'SSR', label: 'SEO + быстрый первый экран' },
-    details: [
-      'Запуск с нуля на Vue 3, Nuxt 3, Pinia и Tailwind CSS.',
-      'Аутентификация и авторизация на основе JWT.',
-      'Оптимизация загрузки: ленивые компоненты и SSR для SEO и быстрого первого экрана.',
-      'Конструктор витрины маркетплейса и аналитика продаж для продавцов.',
-    ],
-    stack: ['Nuxt 3', 'Vue 3', 'Pinia', 'Tailwind', 'JWT', 'SSR'],
-  },
-  {
-    tag: 'PRODUCT · PLATFORM',
-    company: 'Skycoach',
-    year: '2021 — 2023',
-    title: 'Крупный онлайн-сервис внутриигровых услуг',
-    summary:
-      'Единая платформа для продажи внутриигровых услуг с четырьмя крупными модулями: публичный каталог, личный кабинет клиента, кабинет продавца и административная панель.',
-    metric: {
-      value: '4 крупных модуля',
-      label: 'каталог · кабинет клиента · кабинет продавца · админ-панель',
-    },
-    details: [
-      'Разработал кабинет клиента с нуля: управление заказами, коммуникация с исполнителями, чаты и система чаевых.',
-      'Развивал кабинет исполнителя: поиск и ведение заказов, мультичаты, работа с офферами и маркетплейсом, управление выплатами.',
-      'Разрабатывал внутреннюю админ-панель для управления продуктами, контентом, отзывами, маркетплейсом и финансовой отчётностью.',
-      'Поддерживал и развивал публичную часть платформы: статические страницы, редизайн и развитие UI-компонентов, блог и SSR.',
-    ],
-    stack: ['Vue 2', 'Vuex', 'Vue Router', 'SCSS', 'Webpack', 'SSR'],
-  },
-  {
-    tag: 'ERP · B2C',
-    company: 'Like Центр',
-    year: '2019 — 2021',
-    title: 'ERP-система',
-    summary:
-      'Коммерческая бизнес-платформа, объединяющая 10+ модулей: календарь гипотез, дашборды, CRM, маркетинговую и финансовую отчётность, учёт сотрудников и базу знаний.',
-    metric: { value: '10+ модулей', label: 'единая коммерческая ERP-платформа' },
-    details: [
-      'Единолично разработал MVP платформы на jQuery за ~1 месяц во внерабочее время.',
-      'После MVP участвовал в полной переработке и масштабировании платформы на Vue 2 + Vuex + Vue Router совместно с расширенной командой разработки.',
-      'Играл ключевую роль в развитии продукта: от проектирования и прототипирования новых модулей до реализации и выпуска релизов.',
-      'Развивал продукт в тесном взаимодействии с маркетингом, дизайном и backend-разработчиками.',
-      'Участвовал в онбординге новых разработчиков и проведении технических собеседований.',
-    ],
-    stack: ['Vue 2', 'Vuex', 'Vue Router', 'jQuery', 'SCSS'],
-  },
-  {
-    tag: 'LANDING · MOTION',
-    company: 'Like Центр',
-    year: '2017 — 2021',
-    title: 'Лендинги и анимации для образовательных курсов',
-    summary:
-      'Разрабатывал и поддерживал продающие страницы для крупных образовательных проектов — от вёрстки и анимации до интеграции с backend-шаблонизаторами.',
-    metric: { value: '80+', label: 'лендингов за четыре года' },
-    details: [
-      'Живые CSS и SVG-анимации, точечное использование GSAP и Animate.css.',
-      'Перенос вёрстки на шаблонизаторы Twig и Blade.',
-      'Техподдержка и постоянная оптимизация уже работающих решений.',
-      '80+ страниц за 4 года при параллельной поддержке существующих проектов.',
-    ],
-    stack: ['HTML', 'Pug', 'Sass', 'jQuery', 'БЭМ', 'SVG'],
-  },
-]
-
-const MQ_A = ['Vue 3', 'Nuxt', 'TypeScript', 'Pinia', 'Quasar', 'Tailwind', 'Vite', 'Vitest']
-const MQ_B = ['WebSockets', 'REST API', 'FSD', 'Figma', 'SSR', 'Design System', 'Pixel Perfect', 'БЭМ']
-
-const esc = (s: string) =>
-  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
 export default defineNuxtPlugin((nuxtApp) => {
   if (import.meta.server) return
@@ -134,7 +15,6 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   let lenis: Lenis | null = null
-  const t0 = Date.now()
 
   const sref = () => ScrollTrigger.refresh()
 
@@ -216,85 +96,6 @@ export default defineNuxtPlugin((nuxtApp) => {
       )
     })
 
-    $$('.about__card').forEach((c) => {
-      const b = $<HTMLButtonElement>('button', c)
-      b?.addEventListener('click', () => {
-        const o = c.classList.toggle('about__card--open')
-        b.setAttribute('aria-expanded', String(o))
-        window.setTimeout(sref, 480)
-      })
-    })
-
-    const gr = $('#grid')
-    const meta = (p: Project) => `${p.tag} · ${p.company} · ${p.year}`
-
-    PROJECTS.forEach((p, i) => {
-      const b = document.createElement('button')
-      b.type = 'button'
-      b.className = 'works__card' + (i === 3 ? ' works__card--dark' : '')
-      b.innerHTML =
-        `<span><span class="mono works__meta">${esc(meta(p))}</span>` +
-        `<h3 class="works__title">${esc(p.title)}</h3>` +
-        `<span class="works__desc">${esc(p.summary)}</span></span>` +
-        `<span class="works__peek">${esc(p.stack.join(' · '))}</span>` +
-        `<span class="works__go">Подробнее →</span>`
-      gr?.appendChild(b)
-
-      b.addEventListener('pointermove', (e) => {
-        const r = b.getBoundingClientRect()
-        b.style.setProperty('--x', `${e.clientX - r.left}px`)
-        b.style.setProperty('--y', `${e.clientY - r.top}px`)
-      })
-
-      b.addEventListener('click', (e) => {
-        const d = $<HTMLDialogElement>('#dlg')
-        if (!d) return
-        const dm = $('#dm'); const dt = $('#dt'); const dd = $('#dd'); const dc = $('#dc')
-        const dmtr = $('#dmetric'); const ddet = $('#ddetails')
-        if (dm) dm.textContent = meta(p)
-        if (dt) dt.textContent = p.title
-        if (dd) dd.textContent = p.summary
-        if (dmtr) {
-          dmtr.hidden = false
-          dmtr.innerHTML =
-            `<b class="dialog__metric-value">${esc(p.metric.value)}</b>` +
-            `<span class="dialog__metric-label">${esc(p.metric.label)}</span>`
-        }
-        if (ddet) ddet.innerHTML = p.details.map((s) => `<li class="dialog__detail">${esc(s)}</li>`).join('')
-        if (dc) dc.innerHTML = p.stack.map((s) => `<li class="dialog__chip">${esc(s)}</li>`).join('')
-        d.showModal()
-        lenis?.stop()
-        if (!reduce) {
-          const r = d.getBoundingClientRect()
-          gsap.fromTo(
-            d,
-            { clipPath: `circle(0px at ${e.clientX - r.left}px ${e.clientY - r.top}px)` },
-            {
-              clipPath: `circle(150% at ${e.clientX - r.left}px ${e.clientY - r.top}px)`,
-              duration: 0.7,
-              ease: 'power3.out',
-              clearProps: 'clipPath',
-            },
-          )
-        }
-      })
-    })
-
-    const dlg = $<HTMLDialogElement>('#dlg')
-    $('#dx')?.addEventListener('click', () => dlg?.close())
-    dlg?.addEventListener('close', () => lenis?.start())
-    dlg?.addEventListener('click', (e) => {
-      if (e.target === dlg) dlg.close()
-    })
-
-    const mq = (el: Element | null, items: string[]) => {
-      if (!el) return
-      const h = items.map((s) => `<li class="stack__mq-tag">${esc(s)}</li>`).join('')
-      el.innerHTML = `<ul class="stack__mq-track">${h}</ul><ul class="stack__mq-track">${h}</ul>`
-    }
-    mq($('.stack__mq:not(.stack__mq--reverse)'), MQ_A)
-    mq($('.stack__mq--reverse'), MQ_B)
-
     const tl = $('#tl')
     const tb = $<SVGPathElement>('#tbase')
     const tp = $<SVGPathElement>('#tprog')
@@ -344,44 +145,9 @@ export default defineNuxtPlugin((nuxtApp) => {
     window.addEventListener('resize', build)
     window.addEventListener('load', build)
 
-    const form = $<HTMLFormElement>('#form')
-    const st = $('#st')
-    form?.addEventListener('submit', async (e) => {
-      e.preventDefault()
-      const f = form.elements as unknown as Record<string, HTMLInputElement | HTMLTextAreaElement>
-      let bad = false
-      ;([['name', 2], ['contact', 3], ['message', 10]] as const).forEach(([key, min]) => {
-        const ok = f[key].value.trim().length >= min
-        f[key].setAttribute('aria-invalid', String(!ok))
-        if (!ok && !bad) f[key].focus()
-        bad = bad || !ok
-      })
-      if (bad) {
-        if (st) st.textContent = 'Проверьте поля: имя от 2, контакт от 3, задача от 10 символов.'
-        return
-      }
-      if (st) st.textContent = 'Отправляю…'
-      try {
-        const res = await $fetch('/api/contact', {
-          method: 'POST',
-          body: {
-            name: f.name.value,
-            contact: f.contact.value,
-            message: f.message.value,
-            website: f.website.value,
-            loadTime: t0,
-          },
-        })
-        if (!(res as { ok?: boolean }).ok) throw new Error('send failed')
-        if (st) st.textContent = 'Готово: заявка отправлена. Отвечу в ближайшее время.'
-        form.reset()
-      } catch {
-        if (st) st.textContent = 'Не получилось отправить. Напишите в Telegram: @lordrawl'
-      }
-    })
-
     if (!reduce) {
       lenis = new Lenis({ lerp: 0.09 })
+      useSmoothScroll().register(lenis)
       lenis.on('scroll', ScrollTrigger.update)
       gsap.ticker.add((t) => lenis?.raf(t * 1000))
       gsap.ticker.lagSmoothing(0)
@@ -502,6 +268,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.hook('app:beforeUnmount', () => {
     lenis?.destroy()
     lenis = null
+    useSmoothScroll().register(null)
     gsap.matchMedia().revert()
     ScrollTrigger.getAll().forEach((t) => t.kill())
   })
