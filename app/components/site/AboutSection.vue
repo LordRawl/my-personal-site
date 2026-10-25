@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { profile } from '~/data/profile'
+
 const { refresh } = useScrollRefresh()
 
 const cards = [
@@ -47,7 +49,9 @@ const toggle = (i: number) => {
     <div class="about__cv">
       <a
         class="btn btn--big"
-        href="https://cdn.poehali.dev/projects/9373486b-8e69-4402-921f-18c7875ec1f7/bucket/e83e94cf-dad1-4c79-ba4b-ad83582fe97b.pdf"
+        :href="profile.resumeUrl"
+        target="_blank"
+        rel="noopener"
       >
         Скачать резюме PDF ↓
       </a>
