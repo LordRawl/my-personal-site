@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { stats, features } from '~/data/about'
+import { profile } from '~/data/profile'
 </script>
 
 <template>
@@ -60,7 +61,7 @@ import { stats, features } from '~/data/about'
             <AppButton
               size="md"
               variant="outline-muted"
-              href="https://cdn.poehali.dev/projects/9373486b-8e69-4402-921f-18c7875ec1f7/bucket/e83e94cf-dad1-4c79-ba4b-ad83582fe97b.pdf"
+              :href="profile.resumeUrl"
               external
               prefix-icon="file-text"
             >
