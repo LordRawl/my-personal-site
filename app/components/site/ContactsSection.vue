@@ -185,11 +185,11 @@ const submit = async () => {
           </div>
 
           <div class="contacts__honeypot" aria-hidden="true">
-            <label>Не заполняйте<input v-model="website" name="website" tabindex="-1" autocomplete="off" /></label>
+            <label>Не заполнять<input v-model="website" name="website" tabindex="-1" autocomplete="off" /></label>
           </div>
 
-          <button class="btn btn--big" type="submit" :disabled="busy">Отправить</button>
           <p class="contacts__status" role="status" aria-live="polite">{{ status }}</p>
+          <button class="btn btn--big" type="submit" :disabled="busy">Отправить</button>
         </form>
       </div>
     </div>
@@ -365,6 +365,7 @@ const submit = async () => {
 .contacts__status {
   min-height: 1.6em;
   margin: 0;
+  color: #e73228;
   font-weight: 700;
 }
 </style>
