@@ -476,13 +476,14 @@ function buildScene(){
   rain=[];const n=reduced?0:(portrait?45:80);for(let i=0;i<n;i++)rain.push({x:rnd()*W,y:rnd()*H,l:10+rnd()*18,v:520+rnd()*380});
 }
 function layout(){
-  const np=innerWidth<=700;const nw=np?480:960,nh=np?760:648;
+  const np=innerWidth<=700;const sh=innerHeight;const smallDesk=!np&&sh<820;
+  const nw=np?480:960,nh=np?760:(smallDesk?560:648);
   const rx=nw/W,ry=nh/H,changed=(nw!==W||nh!==H);
   portrait=np;stage.classList.toggle('portrait',portrait);
   if(changed&&G){cat.x*=rx;G.items.forEach(i=>{i.x*=rx;i.y*=ry});parts=[];floats=[]}
   W=nw;H=nh;DPR=Math.min(2,window.devicePixelRatio||1);
   const cw=Math.max(300,stage.clientWidth);cv.width=Math.round(cw*DPR);cv.height=Math.round(cw*DPR*H/W);
-  SC=cv.width/W;groundY=H-(portrait?66:60);CH=portrait?140:120;IS=portrait?.82:.8;HW=portrait?58:56;
+  SC=cv.width/W;groundY=H-(portrait?66:(smallDesk?50:60));CH=portrait?140:(smallDesk?110:120);IS=portrait?.82:(smallDesk?.78:.8);HW=portrait?58:(smallDesk?54:56);
   cat.x=clamp(cat.x||W/2,40,W-40);buildScene();
 }
 

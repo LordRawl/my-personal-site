@@ -95,10 +95,10 @@ import { formatCount } from '~/utils/format'
   top: calc(-3.25rem + 1px);
 }
 .about__stat.is-on > .about__stat-node {
-  transition-delay: calc(var(--i) * 0.3s);
+  transition-delay: calc(var(--i) * 0.18s);
 }
 .about__stat.is-on > .about__stat-node::after {
-  animation-delay: calc(var(--i) * 0.3s);
+  animation-delay: calc(var(--i) * 0.18s);
 }
 .about__stat-title {
   margin: 0 0 0.8rem;
@@ -138,7 +138,7 @@ import { formatCount } from '~/utils/format'
 html.reveal .about__stats .about__stat {
   background: transparent;
   border-color: var(--bd);
-  transition: background 0.5s calc(1s + var(--i) * 0.3s);
+  transition: background 0.5s calc(1s + var(--i) * 0.18s);
 }
 html.reveal .about__stats .about__stat.is-on {
   background: var(--card);
@@ -149,13 +149,13 @@ html.reveal .about__stats .about__stat > .about__stat-text {
 }
 html.reveal .about__stats .about__stat.is-on > .about__stat-title,
 html.reveal .about__stats .about__stat.is-on > .about__stat-text {
-  animation: rin 0.8s var(--ease) forwards;
+  animation: rin 0.48s var(--ease) forwards;
 }
 html.reveal .about__stats .about__stat.is-on > .about__stat-title {
-  animation-delay: calc(1.05s + var(--i) * 0.3s);
+  animation-delay: calc(1.05s + var(--i) * 0.18s);
 }
 html.reveal .about__stats .about__stat.is-on > .about__stat-text {
-  animation-delay: calc(1.2s + var(--i) * 0.3s);
+  animation-delay: calc(1.2s + var(--i) * 0.18s);
 }
 html.reveal .about__stats .about__stat::before {
   content: '';
@@ -180,7 +180,7 @@ html.reveal .about__stats .about__stat::before {
   opacity: 0;
 }
 html.reveal .about__stats .about__stat.is-on::before {
-  animation: lap 1.5s var(--ease) calc(var(--i) * 0.3s) forwards;
+  animation: lap 0.9s var(--ease) calc(var(--i) * 0.18s) forwards;
 }
 .about__nums {
   display: grid;
