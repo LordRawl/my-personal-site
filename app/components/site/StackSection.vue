@@ -1,148 +1,131 @@
 <script setup lang="ts">
-import { marqueeRows } from '~/data/skills'
-
-const isles = [
-  { title: 'Frontend', items: ['Vue 2/3', 'Nuxt 2/3', 'TypeScript', 'Pinia', 'Quasar', 'Tailwind', 'React', 'jQuery', 'Bootstrap', 'SVG-анимации'] },
-  { title: 'Сборка', items: ['Vite', 'Webpack', 'Gulp', 'Parcel'] },
-  { title: 'Тесты и данные', items: ['Vitest', 'Vue Test Utils', 'REST API', 'WebSockets'] },
-  { title: 'Дизайн', items: ['Figma', 'Photoshop', 'Zeplin', 'Illustrator'] },
-  { title: 'Дополнительно', items: ['Node.js', 'Twig', 'Blade', 'Tilda', 'GetCourse', 'Git Flow'] },
-  { title: 'Методологии', items: ['БЭМ', 'Pixel Perfect', 'FSD'] },
-]
+import { marqueeRows, skillGroups } from '~/data/skills'
 </script>
 
 <template>
-  <section id="stack" class="stack" aria-labelledby="st1">
-    <p class="mono stack__kicker">(03) Стек</p>
-    <h2 id="st1" class="stack__heading">Инструменты, которыми работаю</h2>
+  <section id="stack" class="stack page-section tone tone--dark" aria-labelledby="stack-heading">
+    <SectionSeam fx="wave" num="03" bare />
 
-    <!-- Строка едет на -50%, поэтому список продублирован: на стыке копий нет шва. -->
-    <div class="stack__mq" data-dir="-1" aria-hidden="true">
-      <ul v-for="copy in 2" :key="copy" class="stack__mq-track">
-        <li v-for="item in marqueeRows[0]" :key="item" class="stack__mq-tag">{{ item }}</li>
-      </ul>
-    </div>
-    <div class="stack__mq stack__mq--reverse" data-dir="1" aria-hidden="true">
-      <ul v-for="copy in 2" :key="copy" class="stack__mq-track">
-        <li v-for="item in marqueeRows[1]" :key="item" class="stack__mq-tag">{{ item }}</li>
-      </ul>
-    </div>
+    <div class="stack__inner section-pad">
+      <div class="container">
+        <p class="mono">(03) Стек</p>
+        <h2 id="stack-heading" class="section-title">Инструменты, которыми работаю</h2>
+      </div>
 
-    <div class="stack__isles">
-      <div v-for="i in isles" :key="i.title" class="stack__isle">
-        <h3 class="stack__isle-title">{{ i.title }}</h3>
-        <ul class="stack__isle-tags">
-          <li v-for="item in i.items" :key="item" class="stack__isle-tag">{{ item }}</li>
-        </ul>
+      <div class="stack__marquee" aria-hidden="true">
+        <div v-for="(row, i) in marqueeRows" :key="i" class="stack__marquee-row">
+          <div
+            class="stack__track"
+            :class="{ 'stack__track--outline': i % 2 === 1 }"
+            :data-mq="i"
+          >
+            <template v-for="word in row" :key="word">
+              <span>{{ word }}</span>
+              <i />
+            </template>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="stack__groups">
+          <div v-for="group in skillGroups" :key="group.title" class="stack__group">
+            <h3 class="stack__group-title">{{ group.title }}</h3>
+            <ul class="stack__list">
+              <li v-for="item in group.items" :key="item" class="stack__item">
+                {{ item }}
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 </template>
 
 <style>
-.stack {
-  position: relative;
-  background: var(--bg);
-  padding: 14vh 0 26vh;
+.stack__marquee {
+  margin: 3.5rem 0 0;
+  overflow: clip;
 }
-.stack__kicker {
-  padding: 0 var(--pad);
+.stack__marquee-row {
+  overflow: clip;
+  padding-block: 0.25rem;
 }
-.stack__heading {
-  padding: 0 var(--pad);
-  margin: 1rem 0 3rem;
-  font: 900 clamp(1.6rem, 4vw, 3.4rem) / 1.05 var(--fd);
-}
-.stack__mq {
+.stack__track {
   display: flex;
   width: max-content;
-  margin-bottom: 1rem;
+  align-items: center;
+  gap: 2.5rem;
+  white-space: nowrap;
+  font: 700 clamp(3rem, 8vw, 8rem)/1.1 var(--disp);
+  text-transform: uppercase;
+  letter-spacing: -0.005em;
   will-change: transform;
 }
-.stack__mq-track {
-  display: flex;
-  gap: 0.8rem;
-  padding: 0 0.4rem;
-  margin: 0;
-  list-style: none;
+.stack__track i {
+  flex: none;
+  width: 0.2em;
+  height: 0.2em;
+  border-radius: 0.04em;
+  background: var(--hot);
 }
-.stack__mq-tag {
-  padding: 0.8rem 1.5rem;
-  border: 1px solid rgba(243, 233, 223, 0.35);
-  border-radius: 99px;
-  font: 500 1.05rem var(--fm);
-  white-space: nowrap;
+.stack__track--outline {
+  color: transparent;
+  -webkit-text-stroke: 2px var(--fg);
 }
-.stack__mq--reverse .stack__mq-tag {
-  background: var(--acc);
-  border-color: var(--acc);
-  color: var(--dk);
-  font-weight: 700;
+.stack__groups {
+  margin: 6rem 0 0;
+  border-top: 1px solid var(--bd);
 }
-.stack__isles {
+.stack__group {
   display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 1.2rem;
-  padding: 4rem var(--pad) 0;
+  grid-template-columns: minmax(9rem, 18rem) 1fr;
+  gap: 1rem 3rem;
+  padding: 1.8rem 0;
+  border-bottom: 1px solid var(--bd);
 }
-.stack__isle {
-  background: var(--bg2);
-  border: 1px solid rgba(243, 233, 223, 0.2);
-  border-radius: 2rem;
-  padding: 1.6rem;
-}
-.stack__isle-title {
-  margin: 0 0 1rem;
-  font: 700 1rem var(--fd);
+.stack__group-title {
+  margin: 0;
+  padding-top: 0.6em;
+  font: 700 0.8rem var(--fm);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   color: var(--acc);
 }
-.stack__isle-tags {
+.stack__list {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  padding: 0;
   margin: 0;
+  padding: 0;
   list-style: none;
+  font: 500 clamp(1.1rem, 2.2vw, 2rem)/1.35 var(--fd);
 }
-.stack__isle-tag {
-  padding: 0.35rem 0.8rem;
-  border-radius: 99px;
-  border: 1px solid rgba(243, 233, 223, 0.3);
-  font-size: 0.9rem;
-  transition:
-    background 0.25s,
-    color 0.25s;
+.stack__inner {
+  position: relative;
+  z-index: 1;
 }
-.stack__isle-tag:hover {
-  background: var(--ink);
-  color: var(--dk);
+.stack__item {
+  display: flex;
+  transition: color 0.25s;
 }
-.stack__isle:nth-child(1) {
-  grid-column: 1 / 8;
+.stack__item:hover {
+  color: var(--hot);
 }
-.stack__isle:nth-child(2) {
-  grid-column: 8 / 13;
-  margin-top: 2.5rem;
+.stack__item:not(:last-child)::after {
+  content: '/';
+  color: var(--hot);
+  margin: 0 0.55em;
 }
-.stack__isle:nth-child(3) {
-  grid-column: 2 / 7;
+html.reveal .stack__group > * {
+  clip-path: inset(0 100% 0 0);
 }
-.stack__isle:nth-child(4) {
-  grid-column: 7 / 12;
-  margin-top: 2rem;
-}
-.stack__isle:nth-child(5) {
-  grid-column: 1 / 7;
-  margin-top: -0.5rem;
-}
-.stack__isle:nth-child(6) {
-  grid-column: 7 / 13;
-  margin-top: 1.5rem;
+html.reveal .stack__group.is-on > * {
+  animation: rin 0.8s var(--ease) var(--d, 0ms) forwards;
 }
 @media (max-width: 800px) {
-  .stack__isle:nth-child(n) {
-    grid-column: 1 / -1;
-    margin: 0;
+  .stack__group {
+    grid-template-columns: 1fr;
   }
 }
 </style>
