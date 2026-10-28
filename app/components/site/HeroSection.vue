@@ -1,40 +1,37 @@
-<script setup lang="ts">
-import { profile } from '~/data/profile'
-</script>
-
 <template>
-  <section class="hero" aria-labelledby="h1">
-    <h1 id="h1" class="sr">
+  <section class="hero page-section" aria-labelledby="hero-title">
+    <h1 id="hero-title" class="sr">
       Frontend под ключ — разработка и проектирование интерфейсов, резюме Ивана Есина
     </h1>
     <p class="mono hero__eyebrow">Frontend-разработчик · Vue 3 · Nuxt · TypeScript</p>
 
     <div class="hero__stage">
-      <div class="hero__gl hero__gl--a" aria-hidden="true">FRONTEND</div>
-      <div class="hero__pic">
+      <div class="hero__word hero__word--back" aria-hidden="true">FRONTEND</div>
+      <div class="hero__pic" style="--ph: url(/portrait.webp)">
         <i class="hero__plate" aria-hidden="true" />
         <img
           id="me"
+          class="hero__photo"
           src="/portrait.webp"
           width="800"
           height="1586"
           alt="Иван Есин, frontend-разработчик"
-          fetchpriority="high"
         />
       </div>
-      <div class="hero__gl hero__gl--b" aria-hidden="true">ПОД КЛЮЧ</div>
+      <div class="hero__word hero__word--front" aria-hidden="true">ПОД КЛЮЧ</div>
     </div>
 
     <div class="hero__copy">
-      <p>
-        Беру задачу целиком: от макета и архитектуры до продакшена. Vue&nbsp;3, Nuxt,
-        TypeScript&nbsp;— 9+ лет и 80+ проектов в&nbsp;проде.
+      <p class="hero__text">
+        Беру задачу целиком: от макета и архитектуры до продакшена. Vue 3, Nuxt,
+        TypeScript — 9+ лет и 80+ проектов в проде.
       </p>
       <div class="hero__cta">
-        <a class="btn btn--big" data-magnet href="#works">Смотреть проекты ↓</a>
-        <a class="hero__link" :href="profile.telegram">Написать в Telegram</a>
+        <a class="btn btn--big" href="#works">Смотреть проекты ↓</a>
       </div>
     </div>
+
+    <span class="section-num section-num--hero" aria-hidden="true">01</span>
   </section>
 </template>
 
@@ -47,18 +44,18 @@ import { profile } from '~/data/profile'
   isolation: isolate;
   display: grid;
   grid-template-rows: auto 1fr auto;
-  padding: 6.2rem var(--pad) 2rem;
+  padding: 6.2rem var(--pad) 1.6rem;
 }
 .hero__eyebrow {
+  color: var(--fg);
   grid-column: 1;
   grid-row: 1;
-  margin: 0;
   position: relative;
   z-index: 5;
 }
 .hero__stage {
   grid-column: 1;
-  grid-row: 2 / 4;
+  grid-row: 2/4;
   position: relative;
   display: flex;
   justify-content: center;
@@ -66,24 +63,24 @@ import { profile } from '~/data/profile'
   margin: 0 calc(var(--pad) * -1);
   min-height: 0;
 }
-.hero__gl {
+.hero__word {
   position: absolute;
   left: 0;
   right: 0;
   margin: 0;
-  font: 900 var(--fs) / 0.92 var(--fd);
+  font: 900 var(--fs)/0.92 var(--fd);
   letter-spacing: -0.04em;
   white-space: nowrap;
   text-align: center;
   pointer-events: none;
   user-select: none;
 }
-.hero__gl--a {
+.hero__word--back {
   top: 2%;
   color: var(--ink);
   z-index: 1;
 }
-.hero__gl--b {
+.hero__word--front {
   top: 50%;
   color: var(--acc);
   z-index: 3;
@@ -92,7 +89,7 @@ import { profile } from '~/data/profile'
   position: relative;
   z-index: 2;
   height: 92%;
-  aspect-ratio: 800 / 1586;
+  aspect-ratio: 800/1586;
   margin-left: 14vw;
 }
 .hero__pic::after {
@@ -106,7 +103,7 @@ import { profile } from '~/data/profile'
   z-index: 3;
   pointer-events: none;
 }
-.hero__pic img {
+.hero__photo {
   position: relative;
   display: block;
   width: 100%;
@@ -117,9 +114,10 @@ import { profile } from '~/data/profile'
   position: absolute;
   inset: 0;
   background: var(--acc);
-  -webkit-mask: var(--ph) center / 100% 100% no-repeat;
-  mask: var(--ph) center / 100% 100% no-repeat;
-  translate: clamp(5px, 0.75vw, 11px) 0;
+  -webkit-mask: var(--ph) center/100% 100% no-repeat;
+  mask: var(--ph) center/100% 100% no-repeat;
+  transform: translateX(0);
+  will-change: transform;
 }
 .hero__copy {
   grid-column: 1;
@@ -129,7 +127,15 @@ import { profile } from '~/data/profile'
   max-width: 31rem;
   align-self: end;
 }
-.hero__copy p {
+.hero__copy::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -1.2rem -4rem -1rem calc(var(--pad) * -1);
+  background: linear-gradient(90deg, rgba(11, 7, 5, 0.92) 38%, rgba(11, 7, 5, 0));
+  pointer-events: none;
+}
+.hero__text {
   margin: 0 0 1.4rem;
   font-size: clamp(0.95rem, 1.25vw, 1.1rem);
 }
@@ -139,14 +145,9 @@ import { profile } from '~/data/profile'
   align-items: center;
   gap: 1rem 1.6rem;
 }
-.hero__link {
-  font-weight: 700;
-  text-decoration: underline;
-  text-underline-offset: 5px;
-}
 @media (max-width: 800px) {
   .hero {
-    --fs: min(15.4vw, 13svh);
+    --fs: min(12vw, 13svh);
     padding-top: 5.6rem;
     height: auto;
     min-height: max(100svh, 38rem);
@@ -164,7 +165,7 @@ import { profile } from '~/data/profile'
     max-width: none;
     margin-top: 0.8rem;
   }
-  .hero__copy p {
+  .hero__text {
     margin-bottom: 1rem;
   }
   .hero__cta {
@@ -173,8 +174,11 @@ import { profile } from '~/data/profile'
   .hero__pic {
     margin-left: 0;
   }
-  .hero__gl--a {
+  .hero__word--back {
     top: 0;
+  }
+  .hero__word--front {
+    top: 50%;
   }
 }
 </style>

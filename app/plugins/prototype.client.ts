@@ -2,274 +2,367 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
 import { useSmoothScroll } from '~/composables/useSmoothScroll'
+import { useSiteMenu } from '~/composables/useSiteMenu'
+import { useReveal } from '~/composables/useReveal'
+import { createSeams } from '~/composables/useSeams'
+import { applyTypography } from '~/utils/typography'
+import { clamp01, smoothstep } from '~/utils/ease'
 
-const $ = <T extends Element = Element>(sel: string, root?: ParentNode): T | null =>
-  (root ?? document).querySelector(sel) as T | null
-const $$ = <T extends Element = Element>(sel: string, root?: ParentNode): T[] =>
-  Array.from((root ?? document).querySelectorAll(sel)) as T[]
+gsap.registerPlugin(ScrollTrigger)
+
+const headingLine =
+  '<svg class="heading-line" viewBox="0 0 200 12" aria-hidden="true"><path pathLength="1" d="M2 7 Q27 -1 52 7 T102 7 T152 7 T198 7"/></svg>'
 
 export default defineNuxtPlugin((nuxtApp) => {
-  if (import.meta.server) return
-
-  gsap.registerPlugin(ScrollTrigger)
-
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  let lenis: Lenis | null = null
-
-  const sref = () => ScrollTrigger.refresh()
+  const reduce =
+    import.meta.client && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  let dispose: (() => void) | undefined
 
   nuxtApp.hook('app:mounted', () => {
-    const me = $<HTMLImageElement>('#me')
-    const pic = $('.hero__pic')
-    if (me && pic) pic.style.setProperty('--ph', `url(${me.src})`)
+    if (!import.meta.client) return
 
-    const bar = $('.bar')
-    const header = $('.header')
-    const hbu = () => {
-      const on = window.scrollY > window.innerHeight * 0.85
-      bar?.classList.toggle('bar--on', on)
-      header?.classList.toggle('header--solid', on)
+    if (!reduce) document.documentElement.classList.add('reveal')
+
+    const smooth = useSmoothScroll()
+    const menu = useSiteMenu()
+    const reveal = useReveal(reduce)
+    const seams = createSeams()
+    const listeners: Array<() => void> = []
+
+    const listen = (
+      target: Window | HTMLElement,
+      type: string,
+      handler: EventListener,
+      options?: AddEventListenerOptions,
+    ) => {
+      target.addEventListener(type, handler, options)
+      listeners.push(() => target.removeEventListener(type, handler, options))
     }
-    window.addEventListener('scroll', hbu, { passive: true })
-    hbu()
 
-    // quickTo держит один рAF-таймер на ось: CSS-transition, перезапускаемая на
-    // каждом pointermove, стартует заново сотни раз в секунду и не успевает
-    // дойти до цели — отсюда и рывок.
-    const plate = $<HTMLElement>('.hero__plate')
-    const hero = $('.hero')
-    if (!reduce && plate && hero && window.matchMedia('(hover:hover)').matches) {
-      const toX = gsap.quickTo(plate, 'x', { duration: 0.5, ease: 'power4.out' })
-      const toY = gsap.quickTo(plate, 'y', { duration: 0.5, ease: 'power4.out' })
-      hero.addEventListener('pointermove', (e) => {
-        const t = e.clientX / window.innerWidth
-        toX((0.5 - t) * 20)
-        toY((e.clientY / window.innerHeight - 0.5) * -3)
+    applyTypography(document.body)
+
+    const photo = document.querySelector<HTMLImageElement>('.hero__photo')
+    const pic = document.querySelector<HTMLElement>('.hero__pic')
+    if (photo && pic) pic.style.setProperty('--ph', `url(${photo.src})`)
+
+    const plate = document.querySelector<HTMLElement>('.hero__plate')
+    const hero = document.querySelector<HTMLElement>('.hero')
+    if (plate && hero && !reduce && window.matchMedia('(hover: hover)').matches) {
+      const moveX = gsap.quickTo(plate, 'x', { duration: 0.5, ease: 'power2.out' })
+      listen(hero, 'pointermove', (e) => {
+        const event = e as PointerEvent
+        const rx = (event.clientX / window.innerWidth - 0.5) * -12
+        moveX(rx)
       })
-      hero.addEventListener('pointerleave', () => {
-        toX(0)
-        toY(0)
+      listen(hero, 'pointerleave', () => {
+        moveX(0)
       })
     }
 
-    const pt = $<SVGSVGElement>('#pt')
-    const ptb = $<SVGPathElement>('#ptb')
-    const ptp = $<SVGPathElement>('#ptp')
-    const ptd = $<SVGCircleElement>('#ptd')
-    let ptl = 0
-
-    const ptSet = (p: number) => {
-      if (!ptp || !ptd) return
-      ;(pt as unknown as Record<string, number>)._p = p
-      ptp.style.strokeDashoffset = String(ptl * (1 - p))
-      const q = ptp.getPointAtLength(ptl * p)
-      ptd.setAttribute('cx', String(q.x))
-      ptd.setAttribute('cy', String(q.y))
-    }
-
-    const ptBuild = () => {
-      if (!pt || !ptb || !ptp) return
-      const h = document.documentElement.scrollHeight
-      let d = 'M10,0'
-      let y = 0
-      while (y < h) {
-        d += ` C2,${y + 200} 18,${y + 400} 10,${y + 600}`
-        y += 600
-      }
-      pt.setAttribute('height', String(h))
-      pt.setAttribute('viewBox', `0 0 20 ${h}`)
-      ptb.setAttribute('d', d)
-      ptp.setAttribute('d', d)
-      ptl = ptp.getTotalLength()
-      ptp.style.strokeDasharray = String(ptl)
-      ptSet(reduce ? 1 : ((pt as unknown as Record<string, number>)._p ?? 0))
-    }
-
-    ptBuild()
-    window.addEventListener('load', ptBuild)
-    window.addEventListener('resize', ptBuild)
-
-    $$('h2').forEach((h) => {
-      h.insertAdjacentHTML(
-        'beforeend',
-        '<svg class="ul" viewBox="0 0 200 12" aria-hidden="true"><path pathLength="1" d="M2 7 Q27 -1 52 7 T102 7 T152 7 T198 7"/></svg>',
-      )
+    document.querySelectorAll<HTMLElement>('.section-title, .contacts__heading').forEach((heading) => {
+      heading.insertAdjacentHTML('beforeend', headingLine)
     })
 
-    const tl = $('#tl')
-    const tb = $<SVGPathElement>('#tbase')
-    const tp = $<SVGPathElement>('#tprog')
-    const dot = $<SVGCircleElement>('#tdot')
-    const tsvg = $<SVGSVGElement>('#tsvg')
-    let tlen = 0
+    reveal.arm('.works__item, .stack__group, .xp__edu-row, .section-title, .contacts__heading')
+    reveal.count('.about__num')
 
-    const setP = (p: number) => {
-      if (!tp || !dot || !tl) return
-      ;(tl as unknown as Record<string, number>)._p = p
-      tp.style.strokeDashoffset = String(tlen * (1 - p))
-      const q = tp.getPointAtLength(tlen * p)
-      dot.setAttribute('cx', String(q.x))
-      dot.setAttribute('cy', String(q.y))
+    const stats = document.querySelector<HTMLElement>('.about__stats')
+    const statCards = Array.from(
+      document.querySelectorAll<HTMLElement>('.about__stat'),
+    )
+    const statsTick = () => {
+      if (!stats) return
+      const rect = stats.getBoundingClientRect()
+      const progress = reduce
+        ? 1
+        : clamp01((window.innerHeight * 0.78 - rect.top) / (rect.height + window.innerHeight * 0.1))
+      stats.style.setProperty('--p', String(progress))
+      statCards.forEach((card, i) => {
+        if (progress >= i / statCards.length + 0.04) card.classList.add('is-on')
+      })
     }
 
-    const build = () => {
-      if (!tl || !tb || !tp || !tsvg) return
-      const h = tl.offsetHeight
-      let d = 'M30,0'
-      let y = 0
-      while (y < h) {
-        d += ` C6,${y + 80} 54,${y + 170} 30,${y + 250}`
-        y += 250
+    const timeline = document.querySelector<HTMLElement>('.xp__timeline')
+    const jobs = Array.from(document.querySelectorAll<HTMLElement>('.xp__job'))
+    let lastScroll = window.scrollY
+    let lastTime = performance.now()
+    const timelineTick = () => {
+      if (!timeline) return
+      const now = performance.now()
+      const velocity = Math.abs(window.scrollY - lastScroll) / Math.max(8, now - lastTime)
+      lastScroll = window.scrollY
+      lastTime = now
+      const lead = Math.min(180, velocity * 240)
+      const rect = timeline.getBoundingClientRect()
+      const fullHeight = reduce
+        ? rect.height
+        : Math.min(rect.height, Math.max(0, window.innerHeight * 0.7 - rect.top))
+      timeline.style.setProperty('--fy', `${fullHeight}px`)
+      const dotY = rect.top + Math.max(fullHeight, 14.4)
+      jobs.forEach((job) => {
+        if (job.classList.contains('is-on')) return
+        const node = job.querySelector<HTMLElement>('.xp__job-node')
+        if (!node) return
+        if (reduce || dotY + lead >= node.getBoundingClientRect().top - 2) {
+          job.classList.add('is-on')
+        }
+      })
+    }
+
+    const tiles = document.querySelector<HTMLElement>('.works__tiles')
+    const glow = document.querySelector<HTMLElement>('.works__glow')
+    let glowX = 0
+    let glowY = 0
+    let targetX = 0
+    let targetY = 0
+    let pointerX = 0
+    let pointerY = 0
+    let pointerSeen = false
+    let glowFrame = 0
+    const placeGlow = () => {
+      if (!glow) return
+      glow.style.transform = `translate3d(${glowX.toFixed(1)}px,${glowY.toFixed(1)}px,0)`
+    }
+    const glowStep = () => {
+      glowFrame = 0
+      glowX += (targetX - glowX) * 0.14
+      glowY += (targetY - glowY) * 0.14
+      placeGlow()
+      if (Math.abs(targetX - glowX) + Math.abs(targetY - glowY) > 0.5) {
+        glowFrame = requestAnimationFrame(glowStep)
       }
-      tsvg.setAttribute('width', '60')
-      tsvg.setAttribute('height', String(h))
-      tsvg.setAttribute('viewBox', `0 0 60 ${h}`)
-      tb.setAttribute('d', d)
-      tp.setAttribute('d', d)
-      tlen = tp.getTotalLength()
-      tp.style.strokeDasharray = String(tlen)
-      setP(reduce ? 1 : ((tl as unknown as Record<string, number>)._p ?? 0))
+    }
+    const aimGlow = () => {
+      if (!tiles || !pointerSeen) return
+      const rect = tiles.getBoundingClientRect()
+      targetX = pointerX - rect.left
+      targetY = pointerY - rect.top
+      if (!glowFrame) glowFrame = requestAnimationFrame(glowStep)
+    }
+    const centerGlow = () => {
+      if (!tiles) return
+      const rect = tiles.getBoundingClientRect()
+      targetX = glowX = rect.width * 0.5
+      targetY = glowY = rect.height * 0.4
+      placeGlow()
+    }
+    if (tiles && !reduce && window.matchMedia('(hover: hover)').matches) {
+      listen(
+        window,
+        'pointermove',
+        (e) => {
+          const event = e as PointerEvent
+          pointerX = event.clientX
+          pointerY = event.clientY
+          pointerSeen = true
+          aimGlow()
+        },
+        { passive: true },
+      )
+      listen(window, 'scroll', aimGlow, { passive: true })
+    }
+    centerGlow()
+    listen(window, 'resize', centerGlow)
+
+    const tracks = Array.from(document.querySelectorAll<HTMLElement>('[data-mq]'))
+    const sections = Array.from(
+      document.querySelectorAll<HTMLElement>('main > section'),
+    )
+    const about = document.querySelector<HTMLElement>('#about')
+    const sectionNums = Array.from(document.querySelectorAll<HTMLElement>('.section-num'))
+    let lastProgress = -1
+
+    const sweep = () => {
+      if (!about) return
+      const height = window.innerHeight
+      const unit = Math.min(210, Math.max(130, window.innerWidth * 0.15))
+      const depth = unit * 0.9
+      const progress = reduce ? 1 : clamp01((height - about.getBoundingClientRect().top) / (height * 0.7))
+      if (progress === 1 && lastProgress === 1) return
+      lastProgress = progress
+      const right = height * 0.54 * (1 - progress)
+      const left = right + depth * progress
+      about.style.clipPath =
+        progress >= 1
+          ? `polygon(0 ${depth.toFixed(1)}px,100% 0,100% 100%,0 100%)`
+          : `polygon(0 ${left.toFixed(1)}px,100% ${right.toFixed(1)}px,100% 100%,0 100%)`
+      sectionNums.forEach((num) => {
+        num.style.opacity = String(smoothstep(0.55, 1, progress))
+      })
     }
 
-    const tornD = () => {
-      let d = `M0,${60 * Math.random() + 20}`
-      for (let i = 1; i <= 36; i++) {
-        d += ` L${i * 40},${i % 2 ? 10 + Math.random() * 30 : 50 + Math.random() * 40}`
+    const tick = () => {
+      const height = window.innerHeight
+      const maxScroll = document.documentElement.scrollHeight - height
+      sweep()
+
+      let activeId = ''
+      for (const section of sections) {
+        if (section.getBoundingClientRect().top <= height * 0.45) activeId = section.id
       }
-      $<SVGPathElement>('#tornl')?.setAttribute('d', d)
-      $<SVGPathElement>('#tornp')?.setAttribute('d', `${d} L1440,100 L0,100 Z`)
+      if (activeId !== menu.active.value) menu.active.value = activeId
+
+      seams.forEach((seam) => {
+        const rect = seam.box.getBoundingClientRect()
+        const end = Math.max(height * 0.38, rect.top + window.scrollY - maxScroll + height * 0.1)
+        seam.draw(reduce ? 1 : clamp01((height - rect.top) / (height - end)), reduce)
+      })
+
+      tracks.forEach((track) => {
+        const row = track.parentElement
+        if (!row) return
+        const rect = row.getBoundingClientRect()
+        const progress = clamp01((height - rect.top) / (height + rect.height))
+        const distance = Math.max(0, track.scrollWidth - window.innerWidth + 80)
+        track.style.transform = reduce
+          ? ''
+          : `translate3d(${-(Number(track.dataset.mq) ? 1 - progress : progress) * distance}px,0,0)`
+      })
     }
 
-    tornD()
-    build()
-    window.addEventListener('resize', build)
-    window.addEventListener('load', build)
+    let frame = 0
+    const requestTick = () => {
+      if (!frame) {
+        frame = requestAnimationFrame(() => {
+          frame = 0
+          tick()
+        })
+      }
+    }
 
+    const onResize = () => {
+      lastProgress = -1
+      seams.forEach((seam) => seam.size())
+      tick()
+    }
+
+    listen(window, 'scroll', requestTick, { passive: true })
+    listen(window, 'resize', onResize)
+
+    const fonts = document.fonts as FontFaceSet | undefined
+    fonts?.ready.then(() => {
+      seams.forEach((seam) => seam.size())
+      tick()
+    })
+
+    let lenis: Lenis | null = null
     if (!reduce) {
       lenis = new Lenis({ lerp: 0.09 })
-      useSmoothScroll().register(lenis)
-      lenis.on('scroll', ScrollTrigger.update)
-      gsap.ticker.add((t) => lenis?.raf(t * 1000))
+      lenis.on('scroll', () => {
+        ScrollTrigger.update()
+        requestTick()
+      })
+      const raf = (time: number) => lenis?.raf(time * 1000)
+      gsap.ticker.add(raf)
       gsap.ticker.lagSmoothing(0)
+      smooth.register(lenis)
+      listeners.push(() => {
+        gsap.ticker.remove(raf)
+        lenis?.destroy()
+        smooth.register(null)
+      })
     }
 
-    $$<HTMLAnchorElement>('a[href^="#"]').forEach((a) => {
-      a.addEventListener('click', (e) => {
-        const id = a.getAttribute('href')
-        if (!id) return
-        const el = id === '#top' ? null : document.getElementById(id.slice(1))
-        if (id !== '#top' && !el) return
+    document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((link) => {
+      link.addEventListener('click', (e) => {
+        const id = link.getAttribute('href') || ''
+        const target = id === '#top' ? null : document.getElementById(id.slice(1))
+        if (id !== '#top' && !target) return
         e.preventDefault()
-        if (lenis) {
-          if (el) lenis.scrollTo(el)
-          else lenis.scrollTo(0)
-        } else if (el) {
-          el.scrollIntoView()
-        } else {
-          window.scrollTo(0, 0)
+        const go = () => {
+          if (lenis) lenis.scrollTo(target ?? 0, { force: true })
+          else if (target) target.scrollIntoView()
+          else window.scrollTo(0, 0)
+          history.pushState(null, '', id)
         }
-        history.pushState(null, '', id)
+        if (menu.open.value) {
+          menu.close()
+          window.setTimeout(go, 80)
+        } else {
+          go()
+        }
       })
     })
 
-    if (reduce) return
+    tick()
+    statsTick()
+    timelineTick()
+    listen(window, 'scroll', statsTick, { passive: true })
+    listen(window, 'scroll', timelineTick, { passive: true })
+    listen(window, 'resize', statsTick)
+    listen(window, 'resize', timelineTick)
 
-    const wp = $<SVGPathElement>('#wavepath')
-    const ws = $<SVGPathElement>('#wavestroke')
-    const Wv = { ph: 0, base: 185, amp: 10 }
-    const wave = () => {
-      let d = ''
-      for (let i = 0; i <= 48; i++) {
-        d += `${i ? ' L' : 'M'}${i * 30},${(Wv.base + Wv.amp * Math.sin(i * 0.35 + Wv.ph)).toFixed(1)}`
-      }
-      ws?.setAttribute('d', d)
-      wp?.setAttribute('d', `${d} L1440,200 L0,200 Z`)
+    const media = gsap.matchMedia()
+    if (!reduce)
+      media.add('(min-width: 0px)', () => {
+        gsap.from('.hero__word', {
+          clipPath: 'inset(0 0 100% 0)',
+          yPercent: 30,
+          duration: 1.5,
+          ease: 'power4.out',
+          stagger: 0.18,
+          delay: 0.1,
+          clearProps: 'clipPath,transform',
+        })
+        gsap.from('.hero__photo', {
+          clipPath: 'inset(100% 0 0 0)',
+          y: 40,
+          duration: 1.5,
+          ease: 'power3.out',
+          delay: 0.3,
+          clearProps: 'clipPath,transform',
+        })
+        gsap.from('.hero__plate', {
+          opacity: 0,
+          duration: 1.2,
+          ease: 'power2.out',
+          delay: 1.1,
+        })
+        gsap.from('.hero__eyebrow,.hero__copy>*', {
+          y: 20,
+          opacity: 0,
+          duration: 1,
+          stagger: 0.12,
+          delay: 0.8,
+          ease: 'power3.out',
+          clearProps: 'transform,opacity',
+        })
+        const scrub = (trigger: string, start: string, end: string) => ({
+          trigger,
+          start,
+          end,
+          scrub: true,
+        })
+        gsap.to('.hero__word--back', {
+          xPercent: -5,
+          ease: 'none',
+          scrollTrigger: scrub('.hero', 'top top', 'bottom top'),
+        })
+        gsap.to('.hero__word--front', {
+          xPercent: 5,
+          ease: 'none',
+          scrollTrigger: scrub('.hero', 'top top', 'bottom top'),
+        })
+        gsap.to('.hero__pic', {
+          y: 60,
+          ease: 'none',
+          scrollTrigger: scrub('.hero', 'top top', 'bottom top'),
+        })
+        window.setTimeout(() => ScrollTrigger.refresh(), 1200)
+      })
+
+    dispose = () => {
+      reveal.disconnect()
+      media.revert()
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
+      listeners.forEach((off) => off())
+      listeners.length = 0
+      if (glowFrame) cancelAnimationFrame(glowFrame)
+      if (frame) cancelAnimationFrame(frame)
+      menu.open.value = false
+      menu.active.value = ''
     }
-    wave()
-
-    const NS = 'http://www.w3.org/2000/svg'
-    const drops: SVGCircleElement[] = []
-    const rims: SVGCircleElement[] = []
-    const PT: [number, number][] = [[8, 28], [22, 30], [36, 27], [50, 31], [64, 28], [78, 30], [92, 27], [15, 34], [43, 34], [71, 34], [99, 34], [1, 34]]
-    const dropsvg = $('#dropsvg')
-    ;[true, false].forEach((rim) => {
-      PT.forEach((p) => {
-        const c = document.createElementNS(NS, 'circle')
-        c.setAttribute('cx', String(p[0]))
-        c.setAttribute('cy', String(p[1]))
-        c.setAttribute('r', '0')
-        if (rim) c.setAttribute('fill', '#E73228')
-        dropsvg?.appendChild(c)
-        ;(rim ? rims : drops).push(c)
-      })
-    })
-
-    const mm = gsap.matchMedia()
-    const S = (trigger: string, start: string, end: string) => ({ trigger, start, end, scrub: true })
-
-    mm.add('(min-width:0px)', () => {
-      gsap.from('.hero__gl', { clipPath: 'inset(0 0 100% 0)', yPercent: 30, duration: 1.5, ease: 'power4.out', stagger: 0.18, delay: 0.1, clearProps: 'clipPath,transform' })
-      gsap.from('.hero__pic img', { clipPath: 'inset(100% 0 0 0)', y: 40, duration: 1.5, ease: 'power3.out', delay: 0.3, clearProps: 'clipPath,transform' })
-      gsap.from('.hero__plate', { opacity: 0, duration: 1.2, ease: 'power2.out', delay: 1.1 })
-      gsap.from('.hero__eyebrow,.hero__copy>*', { y: 20, opacity: 0, duration: 1, stagger: 0.12, delay: 0.8, ease: 'power3.out', clearProps: 'transform,opacity' })
-      gsap.to('.hero__gl--a', { xPercent: -5, ease: 'none', scrollTrigger: S('.hero', 'top top', 'bottom top') })
-      gsap.to('.hero__gl--b', { xPercent: 5, ease: 'none', scrollTrigger: S('.hero', 'top top', 'bottom top') })
-      gsap.to('.hero__pic', { y: 60, ease: 'none', scrollTrigger: S('.hero', 'top top', 'bottom top') })
-      ScrollTrigger.create({ start: 0, end: 'max', onUpdate: (s) => ptSet(s.progress) })
-      ScrollTrigger.addEventListener('refresh', ptBuild)
-      $$('.ul path').forEach((p) => {
-        gsap.fromTo(p, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.2, ease: 'power2.inOut', scrollTrigger: { trigger: p, start: 'top 92%', once: true } })
-      })
-      gsap.to('.about__curtain path', { y: -112, stagger: 0.12, ease: 'none', scrollTrigger: S('.about', 'top 95%', 'top -10%') })
-      $$<HTMLElement>('[data-count]').forEach((el) => {
-        const to = Number(el.dataset.count)
-        const o = { v: 0 }
-        gsap.to(o, { v: to, ease: 'none', onUpdate: () => { el.textContent = String(Math.round(o.v)) }, scrollTrigger: S('.about__stats', 'top 90%', 'top 50%') })
-      })
-      const dtl = gsap.timeline({ scrollTrigger: S('.works', 'top 100%', 'top 35%'), defaults: { ease: 'none' } })
-      ;[3, 9, 0, 6, 11, 2, 8, 5, 1, 10, 4, 7].forEach((k, i) => {
-        dtl.to(rims[k], { attr: { r: 24.35 }, duration: 1 }, i * 0.06).to(drops[k], { attr: { r: 24 }, duration: 1 }, i * 0.06)
-      })
-      gsap.to(Wv, { ph: 6, base: 70, amp: 34, ease: 'none', onUpdate: wave, scrollTrigger: S('.works__wave', 'top 105%', 'bottom 55%') })
-      $$('.stack__mq').forEach((r) => {
-        const d = Number((r as HTMLElement).dataset.dir)
-        gsap.fromTo(r, { xPercent: d > 0 ? -50 : 0 }, { xPercent: d > 0 ? 0 : -50, ease: 'none', scrollTrigger: S('.stack', 'top bottom', 'bottom top') })
-      })
-      gsap.fromTo('.xp__torn', { yPercent: 100 }, { yPercent: 0, ease: 'none', scrollTrigger: S('.xp', 'top 100%', 'top 55%') })
-      ScrollTrigger.create({
-        trigger: '#tl', start: 'top 65%', end: 'bottom 55%', scrub: true, invalidateOnRefresh: true,
-        onUpdate: (s) => setP(s.progress),
-      })
-      gsap.fromTo('.contacts', { clipPath: 'polygon(0 100%,100% 100%,100% 100%,0 100%)' }, { clipPath: 'polygon(0 12%,100% 0%,100% 100%,0 100%)', ease: 'none', scrollTrigger: S('.contacts', 'top 100%', 'top 30%') })
-      gsap.fromTo('.footer__shut path', { y: 100 }, { y: 0, stagger: 0.1, ease: 'none', scrollTrigger: S('.footer', 'top 100%', 'top 55%') })
-      $$('.works__card,.stack__isle,.xp__job').forEach((c) => {
-        gsap.from(c, { y: 50, opacity: 0, duration: 0.9, ease: 'power3.out', clearProps: 'transform,opacity', scrollTrigger: { trigger: c, start: 'top 92%', once: true } })
-      })
-    })
-
-    mm.add('(min-width:801px) and (hover:hover)', () => {
-      $$<HTMLButtonElement>('[data-magnet]').forEach((b) => {
-        b.addEventListener('mousemove', (e) => {
-          const r = b.getBoundingClientRect()
-          gsap.to(b, { x: (e.clientX - r.left - r.width / 2) * 0.25, y: (e.clientY - r.top - r.height / 2) * 0.35, duration: 0.3 })
-        })
-        b.addEventListener('mouseleave', () => {
-          gsap.to(b, { x: 0, y: 0, duration: 0.6, ease: 'elastic.out(1,.4)' })
-        })
-      })
-      $$('.stack__isle').forEach((c, i) => {
-        gsap.to(c, { y: (i % 2 ? -1 : 1) * 30, ease: 'none', scrollTrigger: S('.stack__isles', 'top bottom', 'bottom top') })
-      })
-    })
-
-    window.addEventListener('load', sref)
   })
 
-  nuxtApp.hook('app:beforeUnmount', () => {
-    lenis?.destroy()
-    lenis = null
-    useSmoothScroll().register(null)
-    gsap.matchMedia().revert()
-    ScrollTrigger.getAll().forEach((t) => t.kill())
-  })
+  nuxtApp.hook('app:unmounted', () => dispose?.())
 })
