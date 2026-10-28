@@ -47,7 +47,9 @@ export default defineNuxtPlugin((nuxtApp) => {
 
     const plate = document.querySelector<HTMLElement>('.hero__plate')
     const hero = document.querySelector<HTMLElement>('.hero')
-    if (plate && hero && !reduce && window.matchMedia('(hover: hover)').matches) {
+    if (plate && window.matchMedia('(max-width: 700px)').matches) {
+      plate.style.transform = 'translateX(6px)'
+    } else if (plate && hero && !reduce && window.matchMedia('(hover: hover)').matches) {
       const moveX = gsap.quickTo(plate, 'x', { duration: 0.5, ease: 'power2.out' })
       listen(hero, 'pointermove', (e) => {
         const event = e as PointerEvent

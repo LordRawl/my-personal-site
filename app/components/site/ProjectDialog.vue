@@ -42,6 +42,7 @@ const visible = computed({
   line-height: 1.55;
 }
 .dialog__points {
+  list-style-type: disc;
   margin: 1rem 0;
   padding-left: 1.1rem;
 }
