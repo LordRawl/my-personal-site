@@ -1,259 +1,220 @@
 <script setup lang="ts">
-import { profile } from '~/data/profile'
+const name = ref('')
+const contact = ref('')
+const message = ref('')
+const website = ref('')
+const status = ref('')
+const busy = ref(false)
+const invalid = ref({ name: false, contact: false, message: false })
 
-const form = reactive({ name: '', contact: '', message: '', website: '' })
-const errors = reactive<Record<string, string | undefined>>({})
-const submitted = ref(false)
-const pending = ref(false)
-const toastVisible = ref(false)
-const toastType = ref<'success' | 'error'>('success')
-const loadTime = ref(0)
+const nameEl = ref<HTMLInputElement | null>(null)
+const contactEl = ref<HTMLInputElement | null>(null)
+const messageEl = ref<HTMLTextAreaElement | null>(null)
 
-let toastTimer: ReturnType<typeof setTimeout> | undefined
-let resetTimer: ReturnType<typeof setTimeout> | undefined
-
-onMounted(() => {
-  loadTime.value = Date.now()
-})
-
-const validate = () => {
-  const e: Record<string, string> = {}
-  if (form.name.trim().length < 2) e.name = 'Как к вам обращаться?'
-  if (form.contact.trim().length < 3) e.contact = 'Оставьте почту или ник в Telegram'
-  if (form.message.trim().length < 10) e.message = 'Опишите задачу чуть подробнее — от 10 символов'
-  return e
-}
+const t0 = import.meta.client ? Date.now() : 0
 
 const submit = async () => {
-  if (pending.value || submitted.value) return
-
-  const e = validate()
-  Object.keys(errors).forEach((key) => {
-    errors[key] = undefined
-  })
-  Object.assign(errors, e)
-  if (Object.keys(e).length) return
-
-  pending.value = true
-  toastType.value = 'success'
-
+  if (busy.value) return
+  invalid.value = {
+    name: name.value.trim().length < 2,
+    contact: contact.value.trim().length < 3,
+    message: message.value.trim().length < 10,
+  }
+  const el = invalid.value.name
+    ? nameEl
+    : invalid.value.contact
+      ? contactEl
+      : invalid.value.message
+        ? messageEl
+        : null
+  if (el) {
+    el.value?.focus()
+    status.value = 'Проверьте поля: имя от 2, контакт от 3, задача от 10 символов.'
+    return
+  }
+  busy.value = true
+  status.value = 'Отправляю…'
   try {
-    const res = await $fetch('/api/contact', {
+    const res = await $fetch<{ ok?: boolean }>('/api/contact', {
       method: 'POST',
       body: {
-        name: form.name.trim(),
-        contact: form.contact.trim(),
-        message: form.message.trim(),
-        website: form.website,
-        loadTime: loadTime.value,
+        name: name.value,
+        contact: contact.value,
+        message: message.value,
+        website: website.value,
+        loadTime: t0,
       },
     })
-
-    if (!(res as { ok?: boolean }).ok) throw new Error('Send failed')
-
-    toastType.value = 'success'
-    submitted.value = true
-    form.name = ''
-    form.contact = ''
-    form.message = ''
-    loadTime.value = Date.now()
-    clearTimeout(resetTimer)
-    resetTimer = setTimeout(() => (submitted.value = false), 4000)
+    if (!res.ok) throw new Error('send failed')
+    status.value = 'Готово: заявка отправлена. Отвечу в ближайшее время.'
+    name.value = ''
+    contact.value = ''
+    message.value = ''
   } catch {
-    toastType.value = 'error'
+    status.value = 'Не получилось отправить. Напишите в Telegram: @lordrawl'
   } finally {
-    pending.value = false
-    toastVisible.value = true
-    clearTimeout(toastTimer)
-    toastTimer = setTimeout(() => (toastVisible.value = false), 6000)
+    busy.value = false
   }
 }
-
-const onInput = (field: 'name' | 'contact' | 'message', value: string) => {
-  form[field] = value
-  errors[field] = undefined
-}
-
-onBeforeUnmount(() => {
-  clearTimeout(toastTimer)
-  clearTimeout(resetTimer)
-})
 </script>
 
 <template>
-  <section
-    id="contacts"
-    class="screen grid-lines border-t border-border px-6 py-24 md:px-14 md:py-32 lg:py-10"
-  >
-    <div class="grid lg:grid-cols-[1fr_1fr]">
-      <SectionHeading index="05" eyebrow="Контакты и ссылки" class="order-1">
-        <template #title> Обсудим <span class="text-primary">задачу</span> </template>
-        <template #note>
-          Открыт к удалённой работе, частичной занятости и проектным задачам. Отвечаю в течение дня,
-          срочное — сразу в Telegram.
-        </template>
-      </SectionHeading>
+  <section id="contacts" class="contacts" aria-labelledby="ch">
+    <p class="mono contacts__kicker">(05) Контакты</p>
+    <h2 id="ch" class="contacts__heading">Обсудим задачу</h2>
 
-      <form
-        novalidate
-        class="reveal order-2 lg:col-start-2 lg:row-span-2"
-        style="transition-delay: 180ms"
-        @submit.prevent="submit"
-      >
-        <h3 class="hidden">Написать сообщение</h3>
-
-        <div class="space-y-[clamp(0.75rem,1.8vh,1.25rem)]">
-          <div class="hidden" aria-hidden="true" tabindex="-1">
-            <label for="cf-website">Не заполняйте</label>
-            <input
-              id="cf-website"
-              v-model="form.website"
-              type="text"
-              name="website"
-              autocomplete="off"
-            />
-          </div>
-
-          <div>
-            <label
-              class="mb-2 block text-xs uppercase tracking-[0.16em] text-muted-foreground"
-              for="cf-name"
-            >
-              Имя
-            </label>
-            <input
-              id="cf-name"
-              class="flex h-10 w-full rounded-md border border-border bg-secondary px-3 py-2 text-base text-foreground ring-offset-background transition-colors placeholder:text-muted-foreground/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
-              placeholder="Как к вам обращаться"
-              :value="form.name"
-              @input="onInput('name', ($event.target as HTMLInputElement).value)"
-            />
-            <p v-if="errors.name" class="mt-2 animate-fade-in text-xs text-destructive">
-              {{ errors.name }}
-            </p>
-          </div>
-
-          <div>
-            <label
-              class="mb-2 block text-xs uppercase tracking-[0.16em] text-muted-foreground"
-              for="cf-contact"
-            >
-              Контакт
-            </label>
-            <input
-              id="cf-contact"
-              class="flex h-10 w-full rounded-md border border-border bg-secondary px-3 py-2 text-base text-foreground ring-offset-background transition-colors placeholder:text-muted-foreground/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
-              placeholder="Почта или @telegram"
-              :value="form.contact"
-              @input="onInput('contact', ($event.target as HTMLInputElement).value)"
-            />
-            <p v-if="errors.contact" class="mt-2 animate-fade-in text-xs text-destructive">
-              {{ errors.contact }}
-            </p>
-          </div>
-
-          <div>
-            <label
-              class="mb-2 block text-xs uppercase tracking-[0.16em] text-muted-foreground"
-              for="cf-message"
-            >
-              Задача
-            </label>
-            <textarea
-              id="cf-message"
-              rows="4"
-              class="flex min-h-20 w-full resize-none rounded-md border border-border bg-secondary px-3 py-2 text-sm text-foreground ring-offset-background placeholder:text-muted-foreground/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              placeholder="Продукт, сроки, стек"
-              :value="form.message"
-              @input="onInput('message', ($event.target as HTMLTextAreaElement).value)"
-            />
-            <p v-if="errors.message" class="mt-2 animate-fade-in text-xs text-destructive">
-              {{ errors.message }}
-            </p>
-          </div>
-        </div>
-
-        <AppButton
-          type="submit"
-          size="md"
-          :disabled="pending || submitted"
-          :suffix-icon="submitted ? 'x' : pending ? undefined : 'arrow-right'"
-          class="mt-[clamp(1rem,2.6vh,1.75rem)] w-full"
-        >
-          {{ submitted ? 'Отправлено' : pending ? 'Отправка...' : 'Отправить' }}
-        </AppButton>
-      </form>
-
-      <div class="order-3 flex gap-3 mt-12 lg:col-start-1 lg:row-start-2 lg:mt-auto">
-        <AppButton
-          variant="outline-muted"
-          size="icon-lg"
-          :href="profile.github"
-          external
-          icon="github"
-          aria-label="GitHub"
-          class="reveal"
-          style="transition-delay: 450ms"
-        />
-        <AppButton
-          variant="outline-muted"
-          size="icon-lg"
-          :href="profile.telegram"
-          external
-          icon="send"
-          aria-label="Telegram"
-          class="reveal"
-          style="transition-delay: 540ms"
-        />
-        <AppButton
-          variant="outline-muted"
-          size="icon-lg"
-          :href="`mailto:${profile.email}`"
-          icon="mail"
-          aria-label="Почта"
-          class="reveal"
-          style="transition-delay: 630ms"
-        />
+    <div class="contacts__grid">
+      <div class="contacts__intro">
+        <p class="contacts__lead">
+          Открыт к удалённой работе, частичной занятости и проектным задачам.
+        </p>
+        <ul class="contacts__links">
+          <li><a href="https://github.com/lordrawl">GitHub — lordrawl</a></li>
+          <li><a href="https://t.me/lordrawl">Telegram — @lordrawl</a></li>
+          <li><a href="mailto:lordrawl@gmail.com">lordrawl@gmail.com</a></li>
+        </ul>
       </div>
-    </div>
 
-    <Teleport to="body">
-      <Transition name="toast-slide">
-        <div
-          v-if="toastVisible"
-          class="pointer-events-auto fixed bottom-0 right-0 z-100 m-4 w-[calc(100%-2rem)] rounded-lg border border-border bg-card p-4 text-card-foreground shadow-lg sm:max-w-105"
-          role="status"
+      <form id="form" class="contacts__form" novalidate @submit.prevent="submit">
+        <label class="contacts__field"
+          >Имя<input
+            ref="nameEl"
+            v-model="name"
+            name="name"
+            autocomplete="name"
+            :aria-invalid="invalid.name"
+            required
+        /></label>
+        <label class="contacts__field"
+          >Контакт
+          <input
+            ref="contactEl"
+            v-model="contact"
+            name="contact"
+            autocomplete="off"
+            placeholder="Telegram или e-mail"
+            :aria-invalid="invalid.contact"
+            required
+          /></label
         >
-          <div class="flex items-start gap-3">
-            <span
-              class="mt-0.5 flex h-8 w-8 flex-none items-center justify-center rounded-full bg-primary/15 text-primary"
-            >
-              <AppIcon name="send" :size="15" />
-            </span>
+        <label class="contacts__field"
+          >Задача<textarea
+            ref="messageEl"
+            v-model="message"
+            name="message"
+            rows="4"
+            :aria-invalid="invalid.message"
+            required
+        /></label>
 
-            <div>
-              <p class="font-display text-sm font-semibold text-foreground">
-                {{ toastType === 'success' ? 'Заявка отправлена' : 'Не удалось отправить' }}
-              </p>
-              <p class="mt-1 text-sm leading-relaxed text-muted-foreground">
-                {{
-                  toastType === 'success'
-                    ? 'Отвечу в ближайшее время — проверьте Telegram или почту.'
-                    : 'Попробуйте ещё раз или напишите напрямую в Telegram.'
-                }}
-              </p>
-            </div>
-
-            <AppButton
-              variant="bare"
-              icon="x"
-              class="ml-auto"
-              aria-label="Закрыть уведомление"
-              @click="toastVisible = false"
-            />
-          </div>
+        <div class="contacts__hp" aria-hidden="true">
+          <label>Не заполняйте<input v-model="website" name="website" tabindex="-1" autocomplete="off" /></label>
         </div>
-      </Transition>
-    </Teleport>
+
+        <button class="btn btn--big" data-magnet type="submit" :disabled="busy">Отправить</button>
+        <p id="st" class="contacts__status" role="status" aria-live="polite">{{ status }}</p>
+      </form>
+    </div>
   </section>
 </template>
+
+<style>
+.contacts {
+  position: relative;
+  background: var(--acc);
+  color: var(--dk);
+  padding: 16vh var(--pad) 34vh;
+}
+.contacts__kicker {
+  color: #2b0b07;
+}
+.contacts__heading {
+  margin: 1rem 0 1.5rem;
+  font: 900 clamp(2.4rem, 10.5vw, 10rem) / 0.92 var(--fd);
+  letter-spacing: -0.03em;
+}
+.contacts__grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 2rem;
+  margin-top: 3rem;
+}
+.contacts__intro {
+  grid-column: 1 / 6;
+}
+.contacts__lead {
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin: 0;
+}
+.contacts__links {
+  display: grid;
+  gap: 0.5rem;
+  margin: 2rem 0 0;
+  padding: 0;
+  list-style: none;
+  font: 700 1.1rem var(--fm);
+}
+.contacts__form {
+  grid-column: 7 / 13;
+  display: grid;
+  gap: 1rem;
+}
+.contacts__field {
+  display: grid;
+  gap: 0.4rem;
+  font: 700 0.75rem var(--fm);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.contacts__field input,
+.contacts__field textarea {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid var(--dk);
+  border-radius: 0.8rem;
+  background: #f3e9df;
+  color: var(--dk);
+  font: 500 1rem var(--fm);
+}
+.contacts__field input:focus-visible,
+.contacts__field textarea:focus-visible {
+  outline: 3px solid var(--dk);
+  outline-offset: 2px;
+}
+.contacts__field input[aria-invalid='true'],
+.contacts__field textarea[aria-invalid='true'] {
+  border-color: #fff;
+  box-shadow: 0 0 0 3px var(--dk);
+}
+.contacts__hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.contacts .btn {
+  background: var(--dk);
+  color: var(--cream);
+  justify-self: start;
+}
+.contacts .btn:hover {
+  background: #2a1a12;
+}
+.contacts .btn:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+.contacts__status {
+  min-height: 1.6em;
+  margin: 0;
+  font-weight: 700;
+}
+@media (max-width: 800px) {
+  .contacts__intro,
+  .contacts__form {
+    grid-column: 1 / -1;
+  }
+}
+</style>

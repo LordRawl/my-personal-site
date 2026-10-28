@@ -10,11 +10,3 @@ export const profile = {
   phone: '+7 (953) 039-73-41',
   resumeUrl: '/Есин_И.П.pdf',
 }
-
-export const navLinks = [
-  { id: 'about', label: 'Обо мне' },
-  { id: 'works', label: 'Проекты' },
-  { id: 'stack', label: 'Стек' },
-  { id: 'experience', label: 'Опыт' },
-  { id: 'contacts', label: 'Контакты' },
-]

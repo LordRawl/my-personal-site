@@ -9,13 +9,3 @@ export interface Project {
   stack: string[]
   metric: { value: string; label: string }
 }
-
-export interface ExperienceItem {
-  period: string
-  company: string
-  place: string
-  role: string
-  current?: boolean
-  stack: string
-  points: string[]
-}

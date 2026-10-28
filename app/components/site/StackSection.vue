@@ -1,65 +1,131 @@
 <script setup lang="ts">
-import { skillCategories, everydaySkills, marqueeItems } from '~/data/skills'
+import { marqueeRows, skillGroups } from '~/data/skills'
 </script>
 
 <template>
-  <section
-    id="stack"
-    class="screen grid-lines border-t border-border px-6 py-24 md:px-14 md:py-32 lg:py-10"
-  >
-    <SectionHeading index="03" eyebrow="Стек и навыки">
-      <template #title> Инструменты, которыми <span class="text-primary">работаю</span> </template>
-    </SectionHeading>
+  <section id="stack" class="stack page-section tone tone--dark" aria-labelledby="stack-heading">
+    <SectionSeam fx="wave" num="03" bare />
 
-    <div class="reveal rounded-md border border-border bg-card" style="transition-delay: 120ms">
-      <div class="divide-y divide-border">
-        <div
-          v-for="(cat, i) in skillCategories"
-          :key="cat.id"
-          class="reveal flex flex-col gap-4 px-[clamp(1rem,2.4vh,1.75rem)] py-[clamp(0.65rem,1.4vh,1rem)] lg:flex-row lg:items-start lg:gap-10"
-          :style="{ transitionDelay: `${50 + i * 90}ms` }"
-        >
+    <div class="stack__inner section-pad">
+      <div class="container">
+        <p class="mono">(03) Стек</p>
+        <h2 id="stack-heading" class="section-title">Инструменты, которыми работаю</h2>
+      </div>
+
+      <div class="stack__marquee" aria-hidden="true">
+        <div v-for="(row, i) in marqueeRows" :key="i" class="stack__marquee-row">
           <div
-            class="flex w-full flex-none items-center gap-2.5 font-display text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground lg:w-[220px]"
+            class="stack__track"
+            :class="{ 'stack__track--outline': i % 2 === 1 }"
+            :data-mq="i"
           >
-            <AppIcon :name="cat.icon" :size="15" class="text-primary" />
-            {{ cat.title }}
-          </div>
-          <div class="flex flex-wrap gap-2">
-            <span
-              v-for="item in cat.items"
-              :key="item"
-              class="inline-flex cursor-default items-center gap-2 rounded-md bg-secondary px-3 py-1.5 font-display text-[13px] font-medium text-foreground transition-colors duration-300 hover:text-primary"
-            >
-              <span
-                v-if="everydaySkills.includes(item)"
-                class="hero-mark-dot block h-1.5 w-1.5 flex-none rounded-[2px] bg-primary"
-              />
-              {{ item }}
-            </span>
+            <template v-for="word in row" :key="word">
+              <span>{{ word }}</span>
+              <i />
+            </template>
           </div>
         </div>
       </div>
-    </div>
 
-    <div
-      class="marquee reveal relative mt-[clamp(1.5rem,4vh,3rem)] overflow-hidden border-y border-border py-4"
-      style="transition-delay: 590ms"
-    >
-      <div class="marquee-track">
-        <div v-for="copy in 2" :key="copy" class="flex shrink-0 items-center">
-          <span
-            v-for="item in marqueeItems"
-            :key="`${copy}-${item}`"
-            class="flex items-center gap-6 whitespace-nowrap px-6 font-display text-sm uppercase tracking-[0.18em] text-muted-foreground"
-          >
-            {{ item }}
-            <svg width="7" height="7" viewBox="0 0 7 7" aria-hidden="true">
-              <rect width="7" height="7" rx="1.5" class="fill-primary spin-slow" />
-            </svg>
-          </span>
+      <div class="container">
+        <div class="stack__groups">
+          <div v-for="group in skillGroups" :key="group.title" class="stack__group">
+            <h3 class="stack__group-title">{{ group.title }}</h3>
+            <ul class="stack__list">
+              <li v-for="item in group.items" :key="item" class="stack__item">
+                {{ item }}
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
   </section>
 </template>
+
+<style>
+.stack__marquee {
+  margin: 3.5rem 0 0;
+  overflow: clip;
+}
+.stack__marquee-row {
+  overflow: clip;
+  padding-block: 0.25rem;
+}
+.stack__track {
+  display: flex;
+  width: max-content;
+  align-items: center;
+  gap: 2.5rem;
+  white-space: nowrap;
+  font: 700 clamp(3rem, 8vw, 8rem)/1.1 var(--disp);
+  text-transform: uppercase;
+  letter-spacing: -0.005em;
+  will-change: transform;
+}
+.stack__track i {
+  flex: none;
+  width: 0.2em;
+  height: 0.2em;
+  border-radius: 0.04em;
+  background: var(--hot);
+}
+.stack__track--outline {
+  color: transparent;
+  -webkit-text-stroke: 2px var(--fg);
+}
+.stack__groups {
+  margin: 6rem 0 0;
+  border-top: 1px solid var(--bd);
+}
+.stack__group {
+  display: grid;
+  grid-template-columns: minmax(9rem, 18rem) 1fr;
+  gap: 1rem 3rem;
+  padding: 1.8rem 0;
+  border-bottom: 1px solid var(--bd);
+}
+.stack__group-title {
+  margin: 0;
+  padding-top: 0.6em;
+  font: 700 0.8rem var(--fm);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--acc);
+}
+.stack__list {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font: 500 clamp(1.1rem, 2.2vw, 2rem)/1.35 var(--fd);
+}
+.stack__inner {
+  position: relative;
+  z-index: 1;
+}
+.stack__item {
+  display: flex;
+  transition: color 0.25s;
+}
+.stack__item:hover {
+  color: var(--hot);
+}
+.stack__item:not(:last-child)::after {
+  content: '/';
+  color: var(--hot);
+  margin: 0 0.55em;
+}
+html.reveal .stack__group > * {
+  clip-path: inset(0 100% 0 0);
+}
+html.reveal .stack__group.is-on > * {
+  animation: rin 0.8s var(--ease) var(--d, 0ms) forwards;
+}
+@media (max-width: 800px) {
+  .stack__group {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
