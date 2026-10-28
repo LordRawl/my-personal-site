@@ -1,254 +1,271 @@
 <script setup lang="ts">
+import { approach, facts } from '~/data/about'
 import { profile } from '~/data/profile'
-
-const { refresh } = useScrollRefresh()
-
-const cards = [
-  {
-    title: 'Продуктовый подход',
-    text: 'Вхожу в задачу как в продукт: цель и результат раньше первой строки кода. Пример: запуск маркетплейса в Skycoach с SSR ради SEO.',
-  },
-  {
-    title: 'Самостоятельный frontend',
-    text: 'Закрываю задачу целиком: вёрстка, состояние, работа с API, JWT-авторизация, админ-панель. Не жду, пока всё разжуют.',
-  },
-  {
-    title: 'Производительность',
-    text: 'SSR, lazy loading, виртуализация, контроль бандла. Панель сетевого оборудования выводит 10 000+ элементов одновременно.',
-  },
-  {
-    title: 'Качество кода',
-    text: 'Code review, рефакторинг, миграция. В Cognitech — ключевой ревьюер и миграция проекта на FSD.',
-  },
-]
-
-const open = ref<boolean[]>(cards.map(() => false))
-
-const toggle = (i: number) => {
-  open.value[i] = !open.value[i]
-  // Карточка меняет высоту и сдвигает всё ниже — ScrollTrigger держит старые позиции.
-  window.setTimeout(() => refresh(), 500)
-}
+import { formatCount } from '~/utils/format'
 </script>
 
 <template>
-  <section id="about" class="about" aria-labelledby="ab">
-    <div class="about__curtain" aria-hidden="true">
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none">
-        <path fill="#E73228" d="M0 0H20.3V88Q10 100 0 88Z" />
-        <path fill="#7a1710" d="M20 0H40.3V94Q30 104 20 94Z" />
-        <path fill="#E73228" d="M40 0H60.3V86Q50 98 40 86Z" />
-        <path fill="#7a1710" d="M60 0H80.3V96Q70 106 60 96Z" />
-        <path fill="#E73228" d="M80 0H100V90Q90 102 80 90Z" />
-      </svg>
-    </div>
+  <section id="about" class="about page-section tone tone--light" aria-labelledby="about-heading">
+    <span class="section-num" aria-hidden="true">01</span>
 
-    <p class="mono">(01) Обо мне</p>
-    <h2 id="ab" class="about__heading">От интерфейса до архитектуры: закрываю frontend-задачи целиком</h2>
+    <div class="container about__inner">
+      <p class="mono">(01) Обо мне</p>
+      <h2 id="about-heading" class="section-title">
+        От интерфейса до архитектуры: закрываю frontend-задачи целиком
+      </h2>
 
-    <div class="about__cv">
-      <a
-        class="btn btn--big"
-        :href="profile.resumeUrl"
-        target="_blank"
-        rel="noopener"
-      >
-        Скачать резюме PDF ↓
-      </a>
-    </div>
+      <div class="about__cv">
+        <a class="btn btn--big" :href="profile.resumeUrl">Скачать резюме PDF ↓</a>
+      </div>
 
-    <ul class="about__stats">
-      <li class="about__stat">
-        <b class="about__value"><span data-count="9">9</span>+</b>
-        <span class="mono">лет в разработке</span>
-      </li>
-      <li class="about__stat">
-        <b class="about__value"><span data-count="80">80</span>+</b>
-        <span class="mono">проектов в проде</span>
-      </li>
-      <li class="about__stat">
-        <b class="about__value"><span data-count="3">3</span>+</b>
-        <span class="mono">года средний срок в команде</span>
-      </li>
-      <li class="about__stat">
-        <b class="about__value about__value--stack">Vue / Nuxt</b>
-        <span class="mono">основной стек</span>
-      </li>
-    </ul>
+      <div class="about__stats">
+        <article v-for="card in approach" :key="card.title" class="about__stat">
+          <i class="about__stat-node" />
+          <h3 class="about__stat-title">{{ card.title }}</h3>
+          <p class="about__stat-text">{{ card.text }}</p>
+        </article>
+      </div>
 
-    <div class="about__cards">
-      <article
-        v-for="(c, i) in cards"
-        :key="c.title"
-        class="about__card"
-        :class="{ 'about__card--open': open[i] }"
-      >
-        <button
-          type="button"
-          class="about__toggle"
-          :aria-expanded="open[i]"
-          :aria-controls="`abody-${i}`"
-          @click="toggle(i)"
+      <div class="about__nums">
+        <div
+          v-for="(fact, i) in facts"
+          :key="fact.value"
+          class="about__num"
+          :class="`about__num--${i + 1}`"
         >
-          {{ c.title }}
-          <i class="about__icon" aria-hidden="true" />
-        </button>
-        <div :id="`abody-${i}`" class="about__body"><div><p>{{ c.text }}</p></div></div>
-      </article>
+          <b class="about__num-value" :data-n="fact.value">{{ formatCount(fact.value) }}</b>
+          <p class="about__num-text">{{ fact.text }}</p>
+        </div>
+      </div>
     </div>
   </section>
 </template>
 
 <style>
-.about {
-  position: relative;
-  background: var(--bg);
-  padding: 22vh var(--pad) 44vh;
-  overflow: hidden;
-  isolation: isolate;
-}
-.about__curtain {
-  position: absolute;
-  inset: 0 0 auto;
-  height: 100vh;
-  z-index: 20;
-  pointer-events: none;
-}
-.about__curtain svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-  overflow: visible;
-}
-.about__heading {
-  margin: 1rem 0 2.2rem 6vw;
-  max-width: 17ch;
-  font: 700 clamp(1.8rem, 4.6vw, 4.2rem) / 1.08 var(--fd);
+.about__inner {
+  padding-block: calc(var(--H0) * 0.9 + 1.5rem) calc(var(--H0) + 1rem);
 }
 .about__cv {
-  margin: 0 0 5rem 6vw;
+  margin: 0 0 5rem;
 }
 .about__stats {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 2rem;
-  margin: 0 0 5rem;
-  padding: 2rem 0 0;
-  list-style: none;
-  border-top: 1px solid rgba(243, 233, 223, 0.2);
+  gap: 1.5rem;
+  padding-top: 3.2rem;
+  margin-bottom: 9vh;
 }
-.about__stat {
-  min-width: 0;
-}
-.about__value {
-  display: block;
-  white-space: nowrap;
-  font: 900 clamp(2rem, 4.4vw, 4rem) / 1 var(--fd);
-  color: var(--acc);
-  font-variant-numeric: tabular-nums;
-}
-.about__value--stack {
-  font-size: clamp(1.3rem, 2.6vw, 2.4rem);
-  padding-top: 0.6em;
-}
-.about__cards {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.2rem;
-  align-items: start;
-}
-.about__card {
-  background: var(--bg2);
-  border: 1px solid rgba(243, 233, 223, 0.2);
-  border-radius: 1.2rem;
-  overflow: hidden;
-  transition:
-    border-color 0.3s,
-    background 0.3s;
-}
-.about__card:nth-child(even) {
-  margin-top: 3rem;
-}
-.about__card:hover {
-  border-color: var(--acc);
-}
-.about__toggle {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  width: 100%;
-  padding: 1.5rem;
-  background: none;
-  border: 0;
-  text-align: left;
-  font: 700 1.1rem var(--fd);
-}
-.about__icon {
-  flex: none;
-  width: 2.2rem;
-  height: 2.2rem;
-  border-radius: 50%;
-  border: 1.5px solid var(--acc);
-  position: relative;
-  transition:
-    transform 0.4s var(--ease),
-    background 0.3s;
-}
-.about__icon::before,
-.about__icon::after {
+.about__stats::before,
+.about__stats::after {
   content: '';
   position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 0.9rem;
+  left: 0;
+  right: 0;
+  top: 0.55rem;
   height: 2px;
-  background: var(--acc);
-  transform: translate(-50%, -50%);
+  background: var(--bd);
 }
-.about__icon::after {
-  transform: translate(-50%, -50%) rotate(90deg);
+.about__stats::after {
+  background: var(--hot);
+  transform-origin: left;
+  transform: scaleX(var(--p, 0));
 }
-.about__card--open {
-  background: var(--acc);
-  color: var(--dk);
+.about__stat:nth-child(1) {
+  --i: 0;
 }
-.about__card--open .about__icon {
-  transform: rotate(45deg);
-  border-color: var(--dk);
+.about__stat:nth-child(2) {
+  --i: 1;
 }
-.about__card--open .about__icon::before,
-.about__card--open .about__icon::after {
-  background: var(--dk);
+.about__stat:nth-child(3) {
+  --i: 2;
 }
-.about__body {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.45s var(--ease);
+.about__stat:nth-child(4) {
+  --i: 3;
 }
-.about__body > div {
-  overflow: hidden;
+.about__stat {
+  position: relative;
+  padding: 1.5rem;
+  border-radius: 1.2rem;
+  border: 1.5px solid var(--bd);
+  background: var(--card);
 }
-.about__card--open .about__body {
-  grid-template-rows: 1fr;
+.about__stat > .about__stat-node {
+  left: 1.4rem;
+  top: calc(-3.25rem + 1px);
 }
-.about__body p {
+.about__stat.is-on > .about__stat-node {
+  transition-delay: calc(var(--i) * 0.3s);
+}
+.about__stat.is-on > .about__stat-node::after {
+  animation-delay: calc(var(--i) * 0.3s);
+}
+.about__stat-title {
+  margin: 0 0 0.8rem;
+  font: 700 clamp(1.1rem, 1.6vw, 1.4rem)/1.15 var(--fd);
+}
+.about__stat-text {
   margin: 0;
-  padding: 0 1.5rem 1.5rem;
+  color: var(--mut);
 }
-@media (max-width: 800px) {
+.about__stat-node {
+  position: absolute;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  border: 2px solid var(--hot);
+  background: var(--bg);
+  z-index: 2;
+  transition:
+    background 0.2s var(--ease),
+    transform 0.2s var(--ease);
+}
+.about__stat-node::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 2px solid var(--hot);
+  opacity: 0;
+}
+.about__stat.is-on > .about__stat-node {
+  background: var(--hot);
+  transform: scale(1.25);
+}
+.about__stat.is-on > .about__stat-node::after {
+  animation: pulse2 1s var(--ease) 1 forwards;
+}
+html.reveal .about__stats .about__stat {
+  background: transparent;
+  border-color: var(--bd);
+  transition: background 0.5s calc(1s + var(--i) * 0.3s);
+}
+html.reveal .about__stats .about__stat.is-on {
+  background: var(--card);
+}
+html.reveal .about__stats .about__stat > .about__stat-title,
+html.reveal .about__stats .about__stat > .about__stat-text {
+  clip-path: inset(0 100% 0 0);
+}
+html.reveal .about__stats .about__stat.is-on > .about__stat-title,
+html.reveal .about__stats .about__stat.is-on > .about__stat-text {
+  animation: rin 0.8s var(--ease) forwards;
+}
+html.reveal .about__stats .about__stat.is-on > .about__stat-title {
+  animation-delay: calc(1.05s + var(--i) * 0.3s);
+}
+html.reveal .about__stats .about__stat.is-on > .about__stat-text {
+  animation-delay: calc(1.2s + var(--i) * 0.3s);
+}
+html.reveal .about__stats .about__stat::before {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  z-index: 3;
+  border-radius: inherit;
+  padding: 1.5px;
+  pointer-events: none;
+  background: conic-gradient(
+    from 0deg,
+    var(--ringc, var(--hot)) var(--a),
+    transparent calc(var(--a) + 0.4deg)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  opacity: 0;
+}
+html.reveal .about__stats .about__stat.is-on::before {
+  animation: lap 1.5s var(--ease) calc(var(--i) * 0.3s) forwards;
+}
+.about__nums {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 2.2rem 1.5rem;
+  align-items: start;
+}
+.about__num {
+  --c: var(--fg);
+}
+.about__num--2 {
+  --c: var(--hot);
+}
+.about__num-value {
+  display: block;
+  white-space: nowrap;
+  font: 900 var(--sz)/0.95 var(--fd);
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--c);
+  transition: opacity 0.6s var(--ease);
+}
+.about__num-text {
+  margin: 0.8rem 0 0;
+  max-width: 30rem;
+  color: var(--mut);
+}
+.about__num--1 .about__num-text {
+  max-width: 46rem;
+}
+.about__num--1 {
+  grid-column: 1/8;
+  --sz: clamp(3rem, 8.4vw, 8rem);
+}
+.about__num--2 {
+  grid-column: 8/13;
+  --sz: clamp(3rem, 8.4vw, 8rem);
+}
+.about__num--3 {
+  grid-column: 1/8;
+  --sz: clamp(2.6rem, 6vw, 5.6rem);
+}
+.about__num--4 {
+  grid-column: 8/13;
+  --sz: clamp(2.6rem, 6vw, 5.6rem);
+}
+@media (max-width: 900px) {
   .about__stats {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
+    padding: 0 0 0 2.6rem;
+    gap: 2.4rem;
   }
-  .about__cards {
+  .about__stats::before,
+  .about__stats::after {
+    left: 0.55rem;
+    right: auto;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    height: auto;
+  }
+  .about__stats::after {
+    transform-origin: top;
+    transform: scaleY(var(--p, 0));
+  }
+  .about__stat:nth-child(n) {
+    --i: 0;
+  }
+  .about__stat > .about__stat-node {
+    left: calc(-2.65rem + 1px);
+    top: 1.4rem;
+  }
+  .about__nums {
     grid-template-columns: 1fr;
   }
-  .about__card:nth-child(even) {
-    margin-top: 0;
+  .about__num:nth-child(n) {
+    grid-column: 1/-1;
   }
-  .about__heading,
-  .about__cv {
-    margin-left: 0;
+  .about__num--1,
+  .about__num--2 {
+    --sz: min(12.5vw, 5rem);
+  }
+  .about__num--3,
+  .about__num--4 {
+    --sz: min(14vw, 4.5rem);
   }
 }
 </style>

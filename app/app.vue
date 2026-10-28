@@ -9,6 +9,11 @@ useHead({
   ],
   script: [
     {
+      key: 'reveal-flag',
+      innerHTML:
+        "if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('reveal')",
+    },
+    {
       type: 'application/ld+json',
       innerHTML: JSON.stringify({
         '@context': 'https://schema.org',
@@ -59,21 +64,8 @@ useHead({
 
 <template>
   <div>
-    <!-- Нить вдоль всей страницы: прототип держит её на id, это его JS-хуки. -->
-    <svg id="pt" aria-hidden="true"><path id="ptb" /><path id="ptp" /><circle id="ptd" r="6" /></svg>
-
-    <div class="bar bar--top" aria-hidden="true" />
-
-    <header class="header">
-      <a class="header__brand" href="#top">Иван Есин</a>
-      <nav class="header__nav" aria-label="Основная">
-        <a class="header__link" href="#about">Обо мне</a>
-        <a class="header__link" href="#works">Проекты</a>
-        <a class="header__link" href="#stack">Стек</a>
-        <a class="header__link" href="#experience">Опыт</a>
-        <a class="header__link" href="#contacts">Контакты</a>
-      </nav>
-    </header>
+    <SiteHeader />
+    <SiteMenu />
 
     <main id="top">
       <HeroSection />
@@ -87,81 +79,6 @@ useHead({
     <SiteFooter />
 
     <ProjectDialog />
+    <GameDialog />
   </div>
 </template>
-
-<style>
-.header {
-  position: fixed;
-  inset: 0 0 auto;
-  z-index: 50;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: calc(1rem + env(safe-area-inset-top, 0px)) var(--pad) 1rem;
-  mix-blend-mode: difference;
-  color: #fff;
-}
-.header--solid {
-  mix-blend-mode: normal;
-  color: var(--ink);
-}
-.header__brand,
-.header__link {
-  text-decoration: none;
-  font-size: 0.78rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-.header__nav {
-  display: flex;
-  gap: clamp(0.8rem, 2vw, 2rem);
-}
-.header__link {
-  position: relative;
-  padding: 0.4rem 0;
-  transition: opacity 0.35s var(--ease);
-}
-.header__link::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 2px;
-  background: currentColor;
-  transform: scaleX(0);
-  transform-origin: right;
-  transition: transform 0.5s var(--ease);
-}
-.header__nav:hover .header__link:not(:hover) {
-  opacity: 0.45;
-}
-.header__link:hover::after,
-.header__link:focus-visible::after {
-  transform: scaleX(1);
-  transform-origin: left;
-}
-@media (max-width: 700px) {
-  .header__link:nth-child(n + 3) {
-    display: none;
-  }
-}
-.bar {
-  background: rgba(11, 7, 5, 0.62);
-  position: fixed;
-  inset: 0 0 auto;
-  height: calc(4.8rem + env(safe-area-inset-top, 0px));
-  z-index: 49;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.45s var(--ease);
-  -webkit-backdrop-filter: blur(5px);
-  backdrop-filter: blur(5px);
-  -webkit-mask-image: linear-gradient(#000 72%, transparent);
-  mask-image: linear-gradient(#000 72%, transparent);
-}
-.bar--on {
-  opacity: 1;
-}
-</style>
