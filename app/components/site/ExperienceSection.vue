@@ -1,60 +1,64 @@
 <script setup lang="ts">
-const jobs = [
-  { meta: 'Краснодар · окт. 2024 — наст. время', company: 'Cognitech', text: 'Ключевой ревьюер, миграция на FSD.' },
-  { meta: 'Санкт-Петербург · июнь 2021 — сент. 2024', company: 'Skycoach', text: 'Запуск маркетплейса, JWT, SSR ради SEO, админ-панель.' },
-  { meta: 'Москва · нояб. 2017 — май 2021', company: 'Like Центр', text: 'Десятки лендингов, ключевая роль в ERP, наставничество.' },
-  { meta: 'Удалённо · янв. — нояб. 2017', company: 'Начало пути', text: 'HTML-верстальщик.' },
-]
+import { courses, education, jobs, languages } from '~/data/experience'
 </script>
 
 <template>
-  <section id="experience" class="xp" aria-labelledby="xh">
-    <div class="xp__torn" aria-hidden="true">
-      <svg viewBox="0 0 1440 100" preserveAspectRatio="none">
-        <path id="tornp" fill="#170d08" d="" />
-        <path
-          id="tornl"
-          fill="none"
-          stroke="#E73228"
-          stroke-width="3"
-          vector-effect="non-scaling-stroke"
-          d=""
-        />
-      </svg>
-    </div>
+  <section id="experience" class="xp page-section tone tone--dark" aria-labelledby="experience-heading">
+    <SectionSeam fx="caret" num="04" />
 
-    <div class="xp__grid">
+    <div class="container xp__inner">
       <div class="xp__head">
         <p class="mono">(04) Опыт</p>
-        <h2 id="xh" class="xp__heading">Девять лет в проде</h2>
+        <h2 id="experience-heading" class="section-title">Девять лет в проде</h2>
       </div>
 
-      <div id="tl" class="xp__tl">
-        <svg id="tsvg" aria-hidden="true">
-          <path id="tbase" fill="none" stroke="rgba(243,233,223,.2)" stroke-width="3" />
-          <path id="tprog" fill="none" stroke="#E73228" stroke-width="3" />
-          <circle id="tdot" r="10" fill="#E73228" />
-        </svg>
+      <div class="xp__timeline">
+        <div class="xp__rail" />
+        <i class="xp__dot" />
 
-        <article v-for="j in jobs" :key="j.company" class="xp__job">
-          <p class="mono xp__job-meta">{{ j.meta }}</p>
-          <h3 class="xp__job-title">{{ j.company }}</h3>
-          <p class="xp__job-text">{{ j.text }}</p>
+        <article v-for="job in jobs" :key="job.company + job.period" class="xp__job">
+          <i class="xp__job-node" />
+          <div class="xp__job-meta">
+            <p class="mono xp__job-meta-item">{{ job.period }}</p>
+            <p class="mono xp__job-meta-item">{{ job.place }}</p>
+          </div>
+          <div class="xp__job-body">
+            <h3 class="xp__job-company">{{ job.company }}</h3>
+            <p class="xp__job-role">{{ job.role }}</p>
+            <ul class="xp__job-list">
+              <li v-for="point in job.points" :key="point" class="xp__job-point">{{ point }}</li>
+            </ul>
+            <p class="xp__job-stack">{{ job.stack }}</p>
+          </div>
         </article>
       </div>
 
-      <div class="xp__meta">
-        <div class="xp__meta-card">
-          <p class="mono xp__meta-label">Образование</p>
-          <p class="xp__meta-value">Уральский федеральный университет, 2015</p>
+      <div class="xp__edu">
+        <div class="xp__edu-row">
+          <p class="mono">Образование</p>
+          <div>
+            <b class="xp__edu-year">{{ education.year }}</b>
+            <p class="xp__edu-text">{{ education.university }}</p>
+            <p class="xp__edu-text xp__edu-muted">{{ education.faculty }}</p>
+          </div>
         </div>
-        <div class="xp__meta-card">
-          <p class="mono xp__meta-label">Курсы</p>
-          <p class="xp__meta-value">Vue 3 (JavaScript.Ninja, 2022), HTML Academy (2021) и другие</p>
+
+        <div class="xp__edu-row">
+          <p class="mono">Курсы</p>
+          <ul class="xp__courses">
+            <li v-for="course in courses" :key="course.title" class="xp__course">
+              <span class="xp__course-year">{{ course.year }}</span>{{ course.title }}
+            </li>
+          </ul>
         </div>
-        <div class="xp__meta-card">
-          <p class="mono xp__meta-label">Языки</p>
-          <p class="xp__meta-value">Русский (родной), английский (A2). Рекомендации по запросу.</p>
+
+        <div class="xp__edu-row">
+          <p class="mono">Языки</p>
+          <div class="xp__langs">
+            <p v-for="language in languages" :key="language.name" class="xp__lang">
+              {{ language.name }}<small class="xp__lang-level">{{ language.level }}</small>
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -62,93 +66,224 @@ const jobs = [
 </template>
 
 <style>
-.xp {
-  position: relative;
-  background: var(--bg2);
-  padding: 14vh var(--pad) 36vh;
+.xp__inner {
+  padding-block: calc(var(--H0) * 1.34 + 2rem) calc(var(--H0) + 1rem);
 }
-.xp__torn {
+.xp__head {
+  margin-bottom: 4.5rem;
+}
+.xp__timeline {
+  position: relative;
+  padding-left: 3.2rem;
+}
+.xp__rail {
+  position: absolute;
+  left: 0.55rem;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  overflow: hidden;
+  background: var(--bd);
+  clip-path: inset(0.9rem 0 0 0);
+}
+.xp__rail::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--hot);
+  transform: translateY(calc(var(--fy, 0px) - 100%));
+}
+.xp__dot {
+  position: absolute;
+  left: calc(0.55rem - 5px);
+  top: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--hot);
+  box-shadow: 0 0 0 4px var(--bg);
+  transform: translateY(calc(max(var(--fy, 0px), 0.9rem) - 6px));
+}
+.xp__job {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(9rem, 16rem) 1fr;
+  gap: 0.6rem 3rem;
+  padding: 0 0 4.5rem;
+}
+.xp__job-node {
+  position: absolute;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  border: 2px solid var(--hot);
+  background: var(--bg);
+  z-index: 2;
+  transition:
+    background 0.2s var(--ease),
+    transform 0.2s var(--ease);
+  left: calc(-3.25rem + 1px);
+  top: 0.3rem;
+}
+.xp__job-node::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 2px solid var(--hot);
+  opacity: 0;
+}
+.xp__job.is-on > .xp__job-node {
+  background: var(--hot);
+  transform: scale(1.25);
+}
+.xp__job.is-on > .xp__job-node::after {
+  animation: pulse2 1s var(--ease) 1 forwards;
+}
+.xp__job-meta-item {
+  margin: 0 0 0.3rem;
+}
+.xp__job-company {
+  margin: 0 0 0.3rem;
+  font: 700 clamp(1.4rem, 2.6vw, 2.4rem)/1.1 var(--fd);
+}
+.xp__job-role {
+  margin: 0 0 1rem;
+  color: var(--mut);
+}
+.xp__job-list {
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+  max-width: 46rem;
+}
+.xp__job-point {
+  position: relative;
+  margin: 0.55rem 0;
+  padding-left: 1.4rem;
+}
+.xp__job-point::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.8em;
+  width: 0.7rem;
+  height: 2px;
+  background: var(--hot);
+}
+.xp__job-stack {
+  margin: 0;
+  font: 500 0.8rem var(--fm);
+  color: var(--mut);
+}
+.xp__job:last-child {
+  padding-bottom: 1rem;
+}
+html.reveal .xp__job .xp__job-meta,
+html.reveal .xp__job .xp__job-body {
+  clip-path: inset(0 100% 0 0);
+}
+html.reveal .xp__job.is-on .xp__job-meta {
+  animation: rin 0.8s var(--ease) forwards;
+}
+html.reveal .xp__job.is-on .xp__job-body {
+  animation: rin 0.9s var(--ease) 0.12s forwards;
+}
+.xp__edu {
+  margin-top: 3rem;
+  padding-left: 3.2rem;
+}
+.xp__edu-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(9rem, 16rem) 1fr;
+  gap: 1rem 3rem;
+  padding: 2rem 0;
+}
+.xp__edu-row::before {
+  content: '';
   position: absolute;
   left: 0;
   right: 0;
-  top: -13vh;
-  height: 14vh;
-  pointer-events: none;
-}
-.xp__torn svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-.xp__grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 2rem;
-}
-.xp__head {
-  grid-column: 1 / 6;
-}
-.xp__heading {
-  grid-column: 1 / 6;
-  align-self: start;
-  position: sticky;
-  top: 18vh;
-  margin: 1rem 0 0;
-  font: 900 clamp(2rem, 5.4vw, 5rem) / 1 var(--fd);
-}
-.xp__tl {
-  grid-column: 6 / 13;
-  position: relative;
-  padding-left: 5rem;
-}
-.xp__tl svg {
-  position: absolute;
-  left: 0;
   top: 0;
-  pointer-events: none;
-  overflow: visible;
+  height: 1px;
+  background: var(--bd);
+  transform-origin: left;
 }
-.xp__job {
-  padding: 0 0 4.5rem;
-}
-.xp__job-title {
-  margin: 0.3rem 0 0.6rem;
-  font: 700 clamp(1.2rem, 2vw, 1.7rem) / 1.15 var(--fd);
-}
-.xp__job-meta,
-.xp__job-text {
+.xp__edu-text {
   margin: 0;
-  max-width: 34rem;
 }
-.xp__meta {
-  grid-column: 1 / -1;
+.xp__edu-muted {
+  margin-top: 0.4rem;
+  color: var(--mut);
+}
+.xp__edu-year {
+  display: block;
+  margin: 0 0 1rem;
+  font: 900 clamp(3rem, 9vw, 8rem)/0.9 var(--fd);
+  color: var(--hot);
+}
+.xp__courses {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.xp__course {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.2rem;
-  margin-top: 3rem;
+  grid-template-columns: 4.5rem 1fr;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--bd);
 }
-.xp__meta-card {
-  border: 1px solid rgba(243, 233, 223, 0.2);
-  border-radius: 1.2rem;
-  padding: 1.4rem;
+.xp__course:last-child {
+  border: 0;
 }
-.xp__meta-label,
-.xp__meta-value {
-  margin: 0.4rem 0 0;
+.xp__course-year {
+  padding-top: 0.25em;
+  font: 700 0.85rem var(--fm);
+  color: var(--acc);
+}
+.xp__langs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 3.5rem;
+}
+.xp__lang {
+  font: 700 clamp(1.4rem, 3vw, 2.6rem)/1.1 var(--fd);
+}
+.xp__lang-level {
+  display: block;
+  margin-top: 0.5rem;
+  font: 500 0.85rem var(--fm);
+  color: var(--mut);
+}
+html.reveal .xp__edu-row::before {
+  transform: scaleX(0);
+}
+html.reveal .xp__edu-row.is-on::before {
+  transform: scaleX(1);
+  transition: transform 1s var(--ease) var(--d, 0ms);
+}
+html.reveal .xp__edu-row > * {
+  clip-path: inset(0 100% 0 0);
+}
+html.reveal .xp__edu-row.is-on > * {
+  animation: rin 0.8s var(--ease) calc(var(--d, 0ms) + 0.3s) forwards;
 }
 @media (max-width: 800px) {
-  .xp__head,
-  .xp__tl {
-    grid-column: 1 / -1;
-  }
-  .xp__heading {
-    position: static;
-  }
-  .xp__meta {
+  .xp__job,
+  .xp__edu-row {
     grid-template-columns: 1fr;
+    gap: 0.6rem;
   }
-  .xp__tl {
-    padding-left: 3.5rem;
+  .xp__timeline {
+    padding-left: 2.8rem;
+  }
+  .xp__job-node {
+    left: calc(-2.85rem + 1px);
+  }
+  .xp__edu {
+    padding-left: 0;
   }
 }
 </style>

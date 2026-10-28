@@ -7,13 +7,19 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
   modules: ['@nuxt/eslint', '@nuxt/fonts'],
   fonts: {
-    processCSSVariables: true,
+    processCSSVariables: false,
     families: [
       { name: 'Unbounded', provider: 'google', weights: [700, 900], subsets: ['cyrillic', 'latin'] },
       {
         name: 'JetBrains Mono',
         provider: 'google',
         weights: [400, 500, 700],
+        subsets: ['cyrillic', 'latin'],
+      },
+      {
+        name: 'Oswald',
+        provider: 'google',
+        weights: [500, 700],
         subsets: ['cyrillic', 'latin'],
       },
     ],
