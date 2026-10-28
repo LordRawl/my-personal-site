@@ -506,19 +506,32 @@ html.reveal .works__item.is-on .works__card > :not(.works__card-rev) {
 @media (max-width: 1023px) {
   .works__tiles {
     margin-inline: calc(var(--pad) * -1);
-    background: radial-gradient(
-        circle 70svh at 50% 50%,
-        rgba(255, 110, 92, 0.95),
-        rgba(231, 50, 40, 0.5) 45%,
-        rgba(231, 50, 40, 0)
-      )
-      fixed;
+    background: none;
   }
   .works__glow {
     display: none;
   }
+  .works__grid {
+    gap: 0;
+  }
+  .works__item {
+    background: none;
+    border-bottom: 1px solid var(--hot);
+  }
+  .works__item:first-child {
+    border-top: 1px solid var(--hot);
+  }
   .works__card {
     padding-inline: var(--pad);
+    background: none;
+  }
+}
+@media (max-width: 700px) {
+  .works__card:hover .works__card-rev {
+    clip-path: none;
+  }
+  .works__card:active .works__card-rev {
+    clip-path: circle(150% at var(--x) var(--y));
   }
 }
 </style>

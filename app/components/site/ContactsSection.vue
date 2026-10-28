@@ -188,7 +188,8 @@ const submit = async () => {
             <label>Не заполнять<input v-model="website" name="website" tabindex="-1" autocomplete="off" /></label>
           </div>
 
-          <p class="contacts__status" role="status" aria-live="polite">{{ status }}</p>
+          <p v-if="status" class="contacts__status" role="status" aria-live="polite">{{ status }}</p>
+          
           <button class="btn btn--big" type="submit" :disabled="busy">Отправить</button>
         </form>
       </div>
@@ -263,7 +264,11 @@ const submit = async () => {
   }
   .contacts__socials {
     order: 3;
-    margin-top: 1.5rem;
+    margin: 4rem auto 0;
+    justify-content: space-between;
+    gap: 1rem;
+    max-width: 20rem;
+    width: 100%;
   }
 }
 .contacts__social-link {
