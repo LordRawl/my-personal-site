@@ -170,15 +170,16 @@ export const createSeams = (): Seam[] => {
 
     const draw = (p: number, reduce: boolean) => {
       if (caret) {
+        const q = clamp01((p - 0.45) / 0.55)
         const half = Math.min(640, Math.max(240, W * 0.4)) / 2
-        const dd = easeInOut3(clamp01(p / 0.5)) * 72
+        const dd = easeInOut3(clamp01(q / 0.5)) * 72
         const yc = H * 0.621 + 8 - 25
-        const y2 = yc + easeInOut3(clamp01((p - 0.5) / 0.5)) * 50
+        const y2 = yc + easeInOut3(clamp01((q - 0.5) / 0.5)) * 50
         const points = (y: number) =>
           `${W / 2 - half},${y - dd / 2} ${W / 2},${y + dd / 2} ${W / 2 + half},${y - dd / 2}`
         line1.setAttribute('points', points(yc))
         line2.setAttribute('points', points(y2))
-        line2.style.opacity = p > 0.5 ? '1' : '0'
+        line2.style.opacity = q > 0.5 ? '1' : '0'
         textPrev.style.opacity = reduce ? '1' : String(smoothstep(0.3, 0.85, p))
         return
       }
