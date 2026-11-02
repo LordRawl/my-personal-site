@@ -53,7 +53,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       const moveX = gsap.quickTo(plate, 'x', { duration: 0.5, ease: 'power2.out' })
       listen(hero, 'pointermove', (e) => {
         const event = e as PointerEvent
-        const rx = (event.clientX / window.innerWidth - 0.5) * -12
+        const rx = (event.clientX / window.innerWidth - 0.5) * -24
         moveX(rx)
       })
       listen(hero, 'pointerleave', () => {

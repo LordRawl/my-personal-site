@@ -40,7 +40,7 @@ const aim = (event: PointerEvent) => {
 
     <div class="container section-pad">
       <p class="mono">(02) Проекты</p>
-      <h2 id="works-heading" class="section-title">Что я делал руками</h2>
+      <h2 id="works-heading" class="section-title">Что я делал</h2>
 
       <div class="works__tiles">
         <i class="works__glow" aria-hidden="true" />
