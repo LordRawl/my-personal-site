@@ -145,6 +145,12 @@
   align-items: center;
   gap: 1rem 1.6rem;
 }
+html[data-theme='light'] .hero__pic::after {
+  background: linear-gradient(to bottom, rgba(246, 238, 228, 0), var(--bg) 80%);
+}
+html[data-theme='light'] .hero__copy::before {
+  background: linear-gradient(90deg, rgba(246, 238, 228, 0.94) 38%, rgba(246, 238, 228, 0));
+}
 @media (max-width: 800px) {
   .hero {
     --fs: min(12vw, 13svh);

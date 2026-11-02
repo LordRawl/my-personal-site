@@ -205,6 +205,12 @@ onBeforeUnmount(() => {
     color: var(--hot);
   }
 }
+html[data-theme='light'] .menu {
+  color: var(--dk);
+}
+html[data-theme='light'] .menu__label {
+  color: var(--dk);
+}
 .menu__footer {
   display: flex;
   flex-direction: column;

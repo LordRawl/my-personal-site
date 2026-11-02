@@ -534,4 +534,37 @@ html.reveal .works__item.is-on .works__card > :not(.works__card-rev) {
     clip-path: circle(150% at var(--x) var(--y));
   }
 }
+html[data-theme='light'] .works__card-index {
+  color: #a08b78;
+}
+html[data-theme='light'] .works__tag {
+  border-color: var(--acc);
+  color: var(--acc);
+}
+html[data-theme='light'] .works__card-text {
+  color: var(--mut);
+}
+html[data-theme='light'] .works__card-stack i {
+  background: var(--sec);
+}
+html[data-theme='light'] .works__card-foot {
+  border-top-color: var(--bd);
+  color: var(--mut);
+}
+html[data-theme='light'] .works__card-more {
+  color: var(--acc);
+}
+html[data-theme='light'] .works__card-rev {
+  background: #0b0705;
+  color: #f3e9df;
+}
+html[data-theme='light'] .works__card-rev-value {
+  color: #ff6b61;
+}
+html[data-theme='light'] .works__card-rev-more {
+  color: #ffb3a8;
+}
+html[data-theme='light'] .works__card-rev-label {
+  color: #f3e9df;
+}
 </style>

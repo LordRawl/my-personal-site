@@ -41,11 +41,14 @@ const profiles: Record<
 }
 
 const strokeOf: Record<string, string> = {
-  dark: '#f3e9df',
-  light: '#0b0705',
+  dark: 'var(--sk-dark-ink)',
+  light: 'var(--sk-light-ink)',
   red: '#0b0705',
 }
-const tones: Record<string, string> = { dark: '#0b0705', light: '#f3e9df' }
+const tones: Record<string, string> = {
+  dark: 'var(--sk-dark-bg)',
+  light: 'var(--sk-light-bg)',
+}
 
 const bezier = (pts: [number, number][]) => {
   let d = `M${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`
@@ -71,7 +74,11 @@ export interface Seam {
 export const createSeams = (): Seam[] => {
   const make = (name: string, attrs: Record<string, string> = {}) => {
     const el = document.createElementNS(NS, name)
-    for (const key in attrs) el.setAttribute(key, attrs[key])
+    for (const key in attrs) {
+      const value = attrs[key]
+      if (value.startsWith('var(')) el.style.setProperty(key, value)
+      else el.setAttribute(key, value)
+    }
     return el
   }
 

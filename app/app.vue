@@ -9,6 +9,11 @@ useHead({
   ],
   script: [
     {
+      key: 'theme-init',
+      innerHTML:
+        "(function(){var t=null;try{t=localStorage.getItem('theme')}catch(e){}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);function u(){var m=document.querySelector('meta[name=theme-color]');if(m)m.content=t==='light'?'#f6eee4':'#0b0705'}u();document.addEventListener('DOMContentLoaded',u)})()",
+    },
+    {
       key: 'reveal-flag',
       innerHTML:
         "if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('reveal')",
