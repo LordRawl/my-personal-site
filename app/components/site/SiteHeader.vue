@@ -3,6 +3,7 @@ import { nav } from '~/data/navigation'
 import { profile } from '~/data/profile'
 
 const { open: menuOpen, active, toggle } = useSiteMenu()
+const { isLight, toggle: toggleTheme } = useTheme()
 </script>
 
 <template>
@@ -24,6 +25,40 @@ const { open: menuOpen, active, toggle } = useSiteMenu()
     </nav>
 
     <div class="header__actions">
+      <button
+        class="header__theme"
+        type="button"
+        :aria-label="isLight ? 'Включить тёмную тему' : 'Включить светлую тему'"
+        :aria-pressed="isLight"
+        @click="toggleTheme"
+      >
+        <svg
+          class="header__theme-sun"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <circle cx="12" cy="12" r="4.2" />
+          <path
+            d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7L7 17M17 7l1.7-1.7"
+          />
+        </svg>
+        <svg
+          class="header__theme-moon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M20 14.2A8.2 8.2 0 0 1 9.8 4 8.2 8.2 0 1 0 20 14.2z" />
+        </svg>
+      </button>
       <a
         class="btn btn--sm"
         :href="profile.telegram"
@@ -169,6 +204,46 @@ const { open: menuOpen, active, toggle } = useSiteMenu()
   gap: 6px;
   padding: 6px;
 }
+.header__theme {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 2px solid rgba(243, 233, 223, 0.28);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--cream);
+  transition:
+    background-color 0.3s,
+    border-color 0.3s,
+    color 0.3s;
+}
+.header__theme svg {
+  width: 18px;
+  height: 18px;
+}
+.header__theme-sun {
+  display: none;
+}
+html[data-theme='light'] .header__theme-sun {
+  display: block;
+}
+html[data-theme='light'] .header__theme-moon {
+  display: none;
+}
+@media (hover: hover) {
+  .header__theme:hover {
+    background: var(--hot);
+    border-color: var(--hot);
+    color: #fff;
+  }
+}
+.header__theme:focus-visible {
+  outline: 2px solid var(--hot);
+  outline-offset: 2px;
+}
 .header__burger {
   display: none;
   align-items: center;
@@ -220,6 +295,27 @@ const { open: menuOpen, active, toggle } = useSiteMenu()
 @media (max-width: 1023px) {
   .header__burger {
     display: inline-flex;
+  }
+}
+html[data-theme='light'] .header > * {
+  background: rgba(246, 238, 228, 0.82);
+  color: var(--dk);
+}
+html[data-theme='light'] .header__theme,
+html[data-theme='light'] .header__burger {
+  border-color: rgba(11, 7, 5, 0.28);
+  color: var(--dk);
+}
+@media (hover: hover) {
+  html[data-theme='light'] .header__logo:hover,
+  html[data-theme='light'] .header__theme:hover {
+    background: var(--hot);
+    border-color: var(--hot);
+    color: #fff;
+  }
+  html[data-theme='light'] .header__nav-link:hover {
+    background: rgba(11, 7, 5, 0.08);
+    color: var(--dk);
   }
 }
 </style>

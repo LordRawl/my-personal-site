@@ -71,6 +71,7 @@
   font: 900 var(--fs)/0.92 var(--fd);
   letter-spacing: -0.04em;
   white-space: nowrap;
+  padding-bottom: 0.12em;
   text-align: center;
   pointer-events: none;
   user-select: none;
@@ -97,8 +98,8 @@
   position: absolute;
   left: -40px;
   right: -40px;
-  bottom: -2px;
-  height: 26%;
+  bottom: -42px;
+  height: calc(26% + 40px);
   background: linear-gradient(to bottom, rgba(11, 7, 5, 0), var(--bg) 92%);
   z-index: 3;
   pointer-events: none;
@@ -144,6 +145,12 @@
   flex-wrap: nowrap;
   align-items: center;
   gap: 1rem 1.6rem;
+}
+html[data-theme='light'] .hero__pic::after {
+  background: linear-gradient(to bottom, rgba(246, 238, 228, 0), var(--bg) 80%);
+}
+html[data-theme='light'] .hero__copy::before {
+  background: linear-gradient(90deg, rgba(246, 238, 228, 0.94) 38%, rgba(246, 238, 228, 0));
 }
 @media (max-width: 800px) {
   .hero {

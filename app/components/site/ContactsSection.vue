@@ -201,6 +201,9 @@ const submit = async () => {
 .contacts__heading .heading-line path {
   stroke: var(--dk);
 }
+html[data-theme='light'] .contacts__heading .heading-line path {
+  stroke: var(--hot);
+}
 @keyframes wave {
   0% {
     opacity: 1;
