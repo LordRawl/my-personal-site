@@ -71,6 +71,7 @@
   font: 900 var(--fs)/0.92 var(--fd);
   letter-spacing: -0.04em;
   white-space: nowrap;
+  padding-bottom: 0.12em;
   text-align: center;
   pointer-events: none;
   user-select: none;
