@@ -97,8 +97,8 @@
   position: absolute;
   left: -40px;
   right: -40px;
-  bottom: -2px;
-  height: 26%;
+  bottom: -42px;
+  height: calc(26% + 40px);
   background: linear-gradient(to bottom, rgba(11, 7, 5, 0), var(--bg) 92%);
   z-index: 3;
   pointer-events: none;
